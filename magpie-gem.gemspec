@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "lib/extensions/enumerable.rb",
     "lib/magpie-gem.rb",
     "lib/magpie-gem/base.rb",
     "lib/magpie-gem/company.rb",
