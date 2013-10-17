@@ -8,6 +8,7 @@ module Magpie
       @model = m
       @feed_provider = m.feed_provider
       @id = m.feed_id.to_s
+
       self
     end
 
@@ -44,7 +45,7 @@ module Magpie
 
     def validate
       valid?
-      throw "Validation errors: #{self.errors.full_messages}\nmodel = #{self.inspect}" unless self.errors.messages.count == 0
+      # throw "Validation errors: #{self.errors.full_messages}\nmodel = #{self.inspect}" unless self.errors.messages.count == 0
     end
   end
 end

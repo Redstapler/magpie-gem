@@ -1,3 +1,5 @@
+require 'magpie-gem/postal_address.rb'
+require 'magpie-gem/location.rb'
 module Magpie
   class Company < Magpie::Entity
     has_one :postal_address, class: Magpie::PostalAddress
@@ -31,18 +33,6 @@ module Magpie
         email: email,
         url: url
       })
-    end
-
-    def do_save(options={})
-      action = :update
-      unless @model
-        action = :create
-        @model ||= Company.new
-      end
-
-      validate
-      @model.update_attributes!(model_attributes, :without_protection => true)
-      return action
     end
   end
 end

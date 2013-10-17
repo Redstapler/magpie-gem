@@ -37,19 +37,5 @@ module Magpie
       attribs = model_attributes
       validate_model_attributes_presence [:name, :email, :default_role], attribs
     end
-
-    def do_save(options={})
-      action = :update
-      unless @model
-        action = :create
-        @model ||= @company.model.people.build if @company
-        @model ||= Person.new
-      end
-
-      validate
-      @model.update_attributes!(model_attributes, :without_protection => true)
-      
-      return action
-    end
   end
 end

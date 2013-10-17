@@ -1,3 +1,6 @@
+require 'magpie-gem/property_space_types.rb'
+require 'magpie-gem/property_lcs.rb'
+
 module Magpie
   class PropertySpace < Magpie::Base
     has_one :types, :class => Magpie::PropertySpaceTypes, :context => 'property'

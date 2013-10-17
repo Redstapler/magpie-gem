@@ -1,3 +1,5 @@
+require 'magpie-gem/unit_space_types.rb'
+
 module Magpie
   class UnitSpace < Magpie::Base
     has_one :types, :class => Magpie::UnitSpaceTypes, :context => 'unit'

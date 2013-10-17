@@ -1,3 +1,6 @@
+require 'magpie-gem/property_space_type_lease.rb'
+require 'magpie-gem/rate.rb'
+
 module Magpie
   class PropertySpaceType < Magpie::Base
     attr_accessor :total, :lease, :rate, :specific_rate

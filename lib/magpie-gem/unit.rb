@@ -1,3 +1,9 @@
+require 'magpie-gem/unit_space.rb'
+require 'magpie-gem/unit_lease.rb'
+require 'magpie-gem/contact.rb'
+require 'magpie-gem/media.rb'
+require 'magpie-gem/unit_amenities.rb'
+
 module Magpie
   class Unit < Magpie::Entity
 
@@ -50,40 +56,6 @@ module Magpie
       else
         'available'
       end
-    end
-
-    def lookup_building(property_id)
-      Building.where('feed_provider = ?', @feed_provider).where('feed_id = ?', property_id.to_s).first
-    end
-
-    def do_save(options={})
-      raise 'Must set property on unit before saving' unless @property
-      @building = @property.model
-      # Create building if needed
-      action = :update
-      unless @model
-        action = :create
-        @model ||= @building.spaces.build
-      end
-
-      # Update building attribute
-      @model.use_types = use_types
-      @model.assign_attributes(model_attributes, :without_protection => true)
-      if @model.changed?
-        validate
-        @model.save! 
-      end
-
-      @model.reload
-
-      # Upload media assets
-      options[:type] = 'Space'
-      upload_media_assets(@model, options)
-
-      # Update contacts
-      update_contacts(@model, @contacts)
-
-      action
     end
   end
 end

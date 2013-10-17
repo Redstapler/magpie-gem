@@ -176,42 +176,5 @@ module Magpie
         do_save(options)
       end
     end
-
-  protected
-    def use_types
-      ut = [:office, :retail, :industrial].collect{|k| UseType.find_by_code k if @space.types.send(k).try(:total)}.compact
-      ut = [UseType.find_by_name('Office')] unless ut && ut.length > 0
-      ut
-    end
-
-    def upload_media_assets(obj, options={})
-      unless options[:skip_photos] || @media.nil? || @media.length == 0
-        upload_atts = { attached_type: options[:type] || 'Building', attached_id: obj.id }
-        delete_list = obj.uploads.collect(&:source_url)
-        @media.each do |media|
-          upload_atts.merge!({ source_url: media.url, kind: media.kind })
-          Upload.create(upload_atts, without_protection: true) unless Upload.where(upload_atts).exists? || DeletedUpload.where(source_url: media.url).exists?
-          delete_list.delete media.url
-        end
-
-        obj.uploads.where('source_url in (?)', delete_list).map(&:destroy)
-      end
-    end
-
-    def update_contacts(obj, data)
-      current_contacts_by_email = obj.contacts.index_by{|c| c.person.email }
-      contacts_to_delete = obj.contacts.collect(&:id)
-      data.each {|c|
-        if current_contact = current_contacts_by_email[c.email]
-          if current_contact.role != c.role
-            current_contact.update_attributes!(role: c.role)
-          end
-          contacts_to_delete.delete current_contact.id
-        else
-          obj.contacts.create(:person => Person.find_by_email(c.email), :role => c.role, :send_leads => true)
-        end
-      } unless data.nil?
-      Contact.where('id in (?)', contacts_to_delete).map(&:destroy)
-    end
   end
 end

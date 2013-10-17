@@ -1,3 +1,12 @@
+require 'magpie-gem/property_land.rb'
+require 'magpie-gem/property_built.rb'
+require 'magpie-gem/property_space.rb'
+require 'magpie-gem/property_sale.rb'
+require 'magpie-gem/property_floor_load_ratio.rb'
+require 'magpie-gem/media.rb'
+require 'magpie-gem/contact.rb'
+require 'magpie-gem/property_amenities.rb'
+
 module Magpie
   class Property < Magpie::Entity
     DEDUP_ATTRIBUTES = [:address, :city, :state]
@@ -55,39 +64,5 @@ module Magpie
       attribs = model_attributes
       validate_model_attributes_presence [:address, :city, :state, :postal_code], attribs
     end
-
-    def do_save(options={})
-      # Create building if needed
-      action = :update
-      unless @model
-        action = :create
-        @model ||= Building.new
-      end
-
-      # Update building attribute
-      @model.use_types = use_types
-      @model.assign_attributes(model_attributes, :without_protection => true)
-      if @model.changed?
-        @model.save! 
-      end
-      @model.reload
-
-      # Amenities
-      @model.amenities = @amenities.amenities.except("Paid parking", "Sprinklers", "HVAC", "Elevators", "Sewer", "Doors").collect {|name, value|
-        Amenity.find_or_create_by_name(name)
-      }
-
-      validate
-      @model.save!
-
-      # Upload media assets
-      upload_media_assets(@model, options)
-
-      # Assign people
-      update_contacts(@model, @contacts)
-
-      action
-    end
-
   end
 end

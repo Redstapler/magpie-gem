@@ -4,5 +4,6 @@ describe "MagpieGem" do
   it "loads fine" do
     Magpie::Base.should_not == nil
     Magpie::Unit.should_not == nil
+    Magpie::UnitSpace.should_not == nil
   end
 end

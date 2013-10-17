@@ -1,3 +1,5 @@
+require 'magpie-gem/rate.rb'
+
 module Magpie
   class UnitSpaceType < Magpie::Base
     attr_accessor :available, :rate
