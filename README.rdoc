@@ -1,6 +1,6 @@
 = magpie-gem
 
-Description goes here.
+OfficeSpace Magpie Library
 
 == Contributing to magpie-gem
  
@@ -14,6 +14,6 @@ Description goes here.
 
 == Copyright
 
-Copyright (c) 2013 Amol Kelkar. See LICENSE.txt for
+Copyright (c) 2013 OfficeSpace.com, Inc. See LICENSE.txt for
 further details.
 

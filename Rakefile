@@ -18,7 +18,7 @@ Jeweler::Tasks.new do |gem|
   gem.homepage = "http://github.com/redstapler/magpie-gem"
   gem.license = "MIT"
   gem.summary = %Q{OfficeSpace Magpie Library}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.description = %Q{OfficeSpace Magpie Library}
   gem.email = "tech@officespace.com"
   gem.authors = ["Amol Kelkar"]
   # dependencies defined in Gemfile
