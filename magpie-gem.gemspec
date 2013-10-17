@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "magpie-gem"
-  s.version = ""
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Amol Kelkar"]
@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
     "LICENSE.txt",
     "README.rdoc",
     "Rakefile",
+    "VERSION",
     "lib/base.rb",
     "lib/company.rb",
     "lib/contact.rb",
@@ -57,6 +58,7 @@ Gem::Specification.new do |s|
     "lib/unit_space.rb",
     "lib/unit_space_type.rb",
     "lib/unit_space_types.rb",
+    "magpie-gem.gemspec",
     "spec/magpie-gem_spec.rb",
     "spec/spec_helper.rb"
   ]
