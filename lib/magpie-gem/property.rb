@@ -24,23 +24,23 @@ module Magpie
 
     def load_from_model(building)
       super(building)
-      @name = building.name
-      @description = building.comment
+      self.name = building.name
+      self.description = building.comment
       # updated_at: building.updated_at,
       # active: building.active,
       # owner_company_id: building.owner_company_id,
       # management_company_id: building.management_company_id,
-      @zoning = building.zoning
-      @tax_id_number = building.parcel
-      @location = Magpie::Location.new.load_from_model(building)
-      @land = Magpie::PropertyLand.new.load_from_model(building)
-      @built = Magpie::PropertyBuilt.new.load_from_model(building)
-      @sale = Magpie::PropertySale.new.load_from_model(building)
-      @space = Magpie::PropertySpace.new.load_from_model(building)
-      @media = Magpie::Media.load_medias_from_model(building)
-      @floor_load_ratio = Magpie::PropertyFloorLoadRatio.new.load_from_model(building)
-      @amenities = Magpie::PropertyAmenities.new.load_from_model(building)
-      @contacts = Magpie::Contact.load_contacts_from_model(building)
+      self.zoning = building.zoning
+      self.tax_id_number = building.parcel
+      self.location = Magpie::Location.new.load_from_model(building)
+      self.land = Magpie::PropertyLand.new.load_from_model(building)
+      self.built = Magpie::PropertyBuilt.new.load_from_model(building)
+      self.sale = Magpie::PropertySale.new.load_from_model(building)
+      self.space = Magpie::PropertySpace.new.load_from_model(building)
+      self.media = Magpie::Media.load_medias_from_model(building)
+      self.floor_load_ratio = Magpie::PropertyFloorLoadRatio.new.load_from_model(building)
+      self.amenities = Magpie::PropertyAmenities.new.load_from_model(building)
+      self.contacts = Magpie::Contact.load_contacts_from_model(building)
 
       self
     end

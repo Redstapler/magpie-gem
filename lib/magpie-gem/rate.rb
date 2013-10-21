@@ -1,13 +1,14 @@
 module Magpie
   class Rate < Magpie::Base
     attr_accessor :rate, :min_rate, :max_rate
-
-    validates_presence_of :rate, :min_rate
+    ensure_number_precision(:rate, 4)
+    ensure_number_precision(:min_rate, 4)
+    ensure_number_precision(:max_rate, 4)
 
     def initialize(rate, min_rate, max_rate)
-      @rate = rate || min_rate
-      @min_rate = min_rate || rate
-      @max_rate = max_rate
+      self.rate = rate || min_rate
+      self.min_rate = min_rate || rate
+      self.max_rate = max_rate
     end
 
     def as_json(options)

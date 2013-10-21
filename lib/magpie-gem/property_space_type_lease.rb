@@ -1,10 +1,11 @@
 module Magpie
   class PropertySpaceTypeLease < Magpie::Base
     attr_accessor :type, :tax, :water_sewege, :electrical, :operating_expenses
-
+    ensure_number_precision(:operating_expenses, 4)
+    
     def load_from_model(building)
-      @type = building.lease_type
-      @operating_expenses = building.operating_expenses
+      self.type = building.lease_type
+      self.operating_expenses = building.operating_expenses
 
       whatsIncluded = {}
       whatsIncluded['Gross']          = {tax: true, water_sewege: true, electrical: true}
@@ -15,9 +16,9 @@ module Magpie
       whatsIncluded['Full Service']   = {tax: true, water_sewege: true, electrical: true}
 
       w = whatsIncluded[@type]
-      @tax = included_message w[:tax]
-      @water_sewege = included_message w[:water_sewege]
-      @electrical = included_message w[:electrical]
+      self.tax = included_message w[:tax]
+      self.water_sewege = included_message w[:water_sewege]
+      self.electrical = included_message w[:electrical]
 
       self
     end

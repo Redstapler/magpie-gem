@@ -52,6 +52,16 @@ module Magpie
       "#<#{ self.to_s} #{ self.attributes.collect{ |e| ":#{ e }" }.join(', ') }>"
     end
 
+    def self.ensure_number_precision(attrib, precision)
+      define_method("#{attrib}=") do |value|
+        if value.present? && value.is_a?(Numeric)
+          self.instance_variable_set("@#{attrib}", value.round(precision))
+        else
+          self.instance_variable_set("@#{attrib}", value)
+        end
+      end
+    end
+
     def attributes=(data)
       set_attributes(data, nil)
     end
@@ -101,19 +111,11 @@ module Magpie
 
     def as_json(options={})
       options ||= {}
-      (options[:except] ||= []) << [:errors, :validation_context, :model_class]
-      if options[:include_root].present? && options[:include_root]
-        json = super.as_json(options)
-      else
-        json = super.as_json(options)[self.class.name.demodulize.underscore]
-      end
-
-      json.clean!
+      options[:except] = ((options[:except] || []) << [:errors, :validation_context, :model_class, :precisions]).flatten
+      super.as_json(options).clean!
     end
 
     def from_json(json, context=nil)
-      # puts "Creating #{self.class.name} with #{json}"
-
       obj = JSON.parse(json)
       self.set_attributes(obj, context)
       self
@@ -121,21 +123,21 @@ module Magpie
 
     def prepare_model_for_save
       if @model ||= lookup_model
-        return false if @model.feed_override # We own it now, so don't let feed update it
+        return :skip_override if @model.feed_override # We own it now, so don't let feed update it
         @model.reload
-      elsif @dedup_attributes
+      elsif self.class::DEDUP_ATTRIBUTES
         # Skip if the building is found in the database independent of the feed provider (manually added, etc.)
-        lookup_attributes = model_attributes.slice(*@dedup_attributes)
+        lookup_attributes = model_attributes.slice(*self.class::DEDUP_ATTRIBUTES)
         if lookup_attributes.values.compact.length > 0
-          b = @model_class.where("feed_provider is null or feed_provider != '#{@feed_provider}'").where(lookup_attributes).first
+          b = self.class::MODEL_CLASS.where("feed_provider is null or feed_provider != '#{@feed_provider}'").where(lookup_attributes).first
           if b
             @model = b
-            return false
+            return :skip_independent
           end
         end
       end
 
-      return true
+      return :ready
     end
     
     def model_attributes(level=0)
@@ -170,10 +172,37 @@ module Magpie
     end
 
     def save(options={})
-      return nil unless prepare_model_for_save
+      action = prepare_model_for_save
+      if action == :ready
+        ActiveRecord::Base.transaction do
+          action = do_save(options)
+        end
+      end
 
-      ActiveRecord::Base.transaction do
-        do_save(options)
+      action
+    end
+
+    def save_model
+      # Rails.logger.info("=> @model = #{@model.inspect}")
+      # Rails.logger.info("=> attributes = #{model_attributes}")
+      attrs = model_attributes
+      attrs.each{|k,v|
+        if v.present? && v.is_a?(Numeric)
+          attrs[k] = v.to_s
+        end
+      }
+        
+      @model.assign_attributes(attrs, without_protection: true)
+      # Rails.logger.info("<== @model = #{@model.inspect}")
+      validate
+
+      if @model.changed?
+        # Rails.logger.info("!!!! #{@model.class.name} #{@model.feed_id} changed: #{@model.changes} model attributes: #{attrs}")
+        @model.save!
+        @model.reload
+        true
+      else
+        false
       end
     end
   end

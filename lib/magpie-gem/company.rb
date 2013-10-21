@@ -12,13 +12,13 @@ module Magpie
 
     def load_from_model(company)
       super
-      @id = company.feed_id || company.name
-      @name = company.name
-      @postal_address = Magpie::PostalAddress.new.load_from_model(company)
-      @phone = company.phone
-      @fax = company.fax
-      @email = company.email
-      @url = company.url
+      self.id = company.feed_id || company.name
+      self.name = company.name
+      self.postal_address = Magpie::PostalAddress.new.load_from_model(company)
+      self.phone = company.phone
+      self.fax = company.fax
+      self.email = company.email
+      self.url = company.url
 
       self
     end

@@ -5,15 +5,15 @@ module Magpie
     attr_accessor :ceiling_height
 
     def load_from_model(building)
-      @total = building.office_rsf
-      @ceiling_height = building.ceiling_height
-      @specific_rate = building.office_rate
+      self.total = building.office_rsf
+      self.ceiling_height = building.ceiling_height
+      self.specific_rate = building.office_rate
       super(building)
     end
 
     def model_attributes_base
       {
-        industrial_rsf: @total,
+        office_rsf: @total,
         ceiling_height: @ceiling_height,
         office_rate: @specific_rate
       }
@@ -22,14 +22,14 @@ module Magpie
 
   class PropertySpaceTypeRetail < Magpie::PropertySpaceType
     def load_from_model(building)
-      @total = building.retail_rsf
-      @specific_rate = building.office_rate
+      self.total = building.retail_rsf
+      self.specific_rate = building.office_rate
       super(building)
     end
 
     def model_attributes_base
       {
-        industrial_rsf: @total,
+        retail_rsf: @total,
         office_rate: @specific_rate
       }
     end
@@ -37,8 +37,8 @@ module Magpie
 
   class PropertySpaceTypeIndustrial < Magpie::PropertySpaceType
     def load_from_model(building)
-      @total = building.industrial_rsf
-      @specific_rate = building.warehouse_rate
+      self.total = building.industrial_rsf
+      self.specific_rate = building.warehouse_rate
       super(building)
     end
 
@@ -57,9 +57,9 @@ module Magpie
     attr_accessor :office, :retail, :industrial
 
     def load_from_model(space)
-      @office = Magpie::PropertySpaceTypeOffice.new.load_from_model(space)
-      @retail = Magpie::PropertySpaceTypeRetail.new.load_from_model(space)
-      @industrial = Magpie::PropertySpaceTypeIndustrial.new.load_from_model(space)
+      self.office = Magpie::PropertySpaceTypeOffice.new.load_from_model(space)
+      self.retail = Magpie::PropertySpaceTypeRetail.new.load_from_model(space)
+      self.industrial = Magpie::PropertySpaceTypeIndustrial.new.load_from_model(space)
 
       self
     end

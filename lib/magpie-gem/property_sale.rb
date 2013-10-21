@@ -2,11 +2,14 @@ module Magpie
   class PropertySale < Magpie::Base
     attr_accessor :for_sale, :sale_price, :cap_rate, :sale_status
 
+    ensure_number_precision(:sale_price, 2)
+    ensure_number_precision(:cap_rate, 2)
+    
     def load_from_model(model)
-      @for_sale = model.for_sale
-      @sale_price = model.sale_price
-      @cap_rate = model.cap_rate
-      @sale_status = model.sale_status
+      self.for_sale = model.for_sale
+      self.sale_price = model.sale_price
+      self.cap_rate = model.cap_rate
+      self.sale_status = model.sale_status
 
       self
     end

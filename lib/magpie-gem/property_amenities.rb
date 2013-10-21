@@ -1,9 +1,12 @@
 module Magpie
   class PropertyAmenities < Magpie::Base
     attr_accessor :amenities
+    def initialize
+      self.amenities = HashWithIndifferentAccess.new
+    end
 
     def load_from_model(building)
-      @amenities = HashWithIndifferentAccess.new({
+      self.amenities = HashWithIndifferentAccess.new({
         "Paid parking" => Magpie::PropertyAmenityPaidParking.new.load_from_model(building),
         Sprinklers: building.sprinklers,
         HVAC: building.hvac,
@@ -19,7 +22,8 @@ module Magpie
     end
 
     def as_json(options)
-      super.as_json(options)['amenities']
+      j = super.as_json(options)
+      j.nil? ? nil : j['amenities']
     end
 
     def from_json(json, context=nil)

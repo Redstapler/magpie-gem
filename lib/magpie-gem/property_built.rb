@@ -3,13 +3,13 @@ module Magpie
     attr_accessor :year_built, :year_renovated, :number_buildings, :number_floors, :leed_certification, :construction_status, :class_rating
 
     def load_from_model(model)
-      @year_built = model.year_built
-      @year_renovated = model.year_renovated
-      @number_buildings = model.number_buildings
-      @number_floors = model.number_floors
-      @leed_certification = model.leed_certification
-      @construction_status = model.construction_status
-      @class_rating = model.class_rating
+      self.year_built = model.year_built
+      self.year_renovated = model.year_renovated
+      self.number_buildings = model.number_buildings
+      self.number_floors = model.number_floors
+      self.leed_certification = model.leed_certification
+      self.construction_status = model.construction_status
+      self.class_rating = model.class_rating
 
       self
     end

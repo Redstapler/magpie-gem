@@ -5,9 +5,9 @@ module Magpie
     validates_presence_of :feed_provider, :id
 
     def load_from_model(m)
-      @model = m
-      @feed_provider = m.feed_provider
-      @id = m.feed_id.to_s
+      self.model = m
+      self.feed_provider = m.feed_provider
+      self.id = m.feed_id.to_s
 
       self
     end
@@ -30,6 +30,7 @@ module Magpie
       end
 
       attribs_to_validate.each do |attrib|
+        # puts "Validating #{attrib} for #{prefix} - has value '#{attribs[attrib]}' #{attribs[attrib].blank?}"
         self.errors.messages["#{prefix} / model / #{attrib}".to_sym] = ["can't be blank"] if attribs[attrib].blank?
       end
     end
@@ -39,8 +40,9 @@ module Magpie
     end
 
     def valid?
-      validate_model_attributes
       super
+      validate_model_attributes
+      self.errors.messages.count == 0
     end
 
     def validate

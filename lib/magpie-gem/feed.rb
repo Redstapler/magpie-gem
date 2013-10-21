@@ -6,22 +6,35 @@ module Magpie
     has_many :units, class: Magpie::Unit
     attr_accessor :companies, :people, :properties, :units, :feed_provider
 
+    validate do
+      [:companies, :people, :properties, :units].each {|entity_name_plural|
+        self.send(entity_name_plural).each {|entity|
+          prefix = "#{entity.class.name.demodulize.underscore}_#{entity.id}"
+          unless entity.valid?
+            entity.errors.messages.each{|k,v|
+              self.errors.messages[(prefix + ' / ' + k.to_s).to_sym] = v
+            }
+          end
+        }
+      }
+    end
+    
     def initialize(attributes={})
       super
-      @companies = []
-      @people = []
-      @properties = []
-      @units = []
+      self.companies = []
+      self.people = []
+      self.properties = []
+      self.units = []
     end
 
     def from_json(json, context=nil)
       obj = JSON.parse(json)
 
-      @companies = (obj['companies'] || {}).collect{|c| model = Magpie::Company.new; model.set_attributes(c, 'company'); model.feed_provider = obj['feed_provider']; model}
-      @people = (obj['people'] || {}).collect{|c| model = Magpie::Person.new; model.set_attributes(c, 'person'); model.feed_provider = obj['feed_provider']; model}
-      @properties = (obj['properties'] || {}).collect{|c| model = Magpie::Property.new; model.set_attributes(c, 'property'); model.feed_provider = obj['feed_provider']; model}
-      @units = (obj['units'] || {}).collect{|c| model = Magpie::Unit.new; model.set_attributes(c, 'unit'); model.feed_provider = obj['feed_provider']; model}
-      @feed_provider = obj['feed_provider']
+      self.companies = (obj['companies'] || {}).collect{|c| model = Magpie::Company.new; model.set_attributes(c, 'company'); model.feed_provider = obj['feed_provider']; model}
+      self.people = (obj['people'] || {}).collect{|c| model = Magpie::Person.new; model.set_attributes(c, 'person'); model.feed_provider = obj['feed_provider']; model}
+      self.properties = (obj['properties'] || {}).collect{|c| model = Magpie::Property.new; model.set_attributes(c, 'property'); model.feed_provider = obj['feed_provider']; model}
+      self.units = (obj['units'] || {}).collect{|c| model = Magpie::Unit.new; model.set_attributes(c, 'unit'); model.feed_provider = obj['feed_provider']; model}
+      self.feed_provider = obj['feed_provider']
 
       self
     end

@@ -6,11 +6,15 @@ module Magpie
     has_one :types, :class => Magpie::PropertySpaceTypes, :context => 'property'
 
     attr_accessor :typical_floor_size, :largest_contiguous_space, :types
+    
+    def initialize
+      self.types = Magpie::PropertySpaceTypes.new
+    end
 
     def load_from_model(building)
-      @typical_floor_size = building.typical_floor_size
-      @largest_contiguous_space = Magpie::PropertyLcs.new.load_from_model(building)
-      @types = Magpie::PropertySpaceTypes.new.load_from_model(building)
+      self.typical_floor_size = building.typical_floor_size
+      self.largest_contiguous_space = Magpie::PropertyLcs.new.load_from_model(building)
+      self.types = Magpie::PropertySpaceTypes.new.load_from_model(building)
 
       self
     end

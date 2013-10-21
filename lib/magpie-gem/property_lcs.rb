@@ -3,8 +3,8 @@ module Magpie
     attr_accessor :size, :floor
 
     def load_from_model(building)
-      @size = building.lcs_size
-      @floor = building.lcs_floor_number
+      self.size = building.lcs_size
+      self.floor = building.lcs_floor_number
 
       self
     end

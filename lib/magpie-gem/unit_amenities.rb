@@ -2,8 +2,12 @@ module Magpie
   class UnitAmenities < Magpie::Base
     attr_accessor :amenities
 
+    def initialize
+      self.amenities = HashWithIndifferentAccess.new
+    end
+
     def load_from_model(space)
-      @amenities = HashWithIndifferentAccess.new({
+      self.amenities = HashWithIndifferentAccess.new({
         Sprinklers: space.sprinklers,
         Furnished: space.furnished,
         Doors: Magpie::UnitAmenityDoors.new.load_from_model(space)
@@ -12,7 +16,8 @@ module Magpie
     end
 
     def as_json(options)
-      super.as_json(options)['amenities']
+      j = super.as_json(options)
+      j.nil? ? nil : j['amenities']
     end
 
     def from_json(json, context=nil)
@@ -33,6 +38,9 @@ module Magpie
 
   class UnitAmenityDoors < Magpie::Base
     attr_accessor :dock, :grade
+    ensure_number_precision(:dock, 0)
+    ensure_number_precision(:grade, 0)
+
     def load_from_model(building)
       @dock = building.dock_height
       @grade = building.grade_level

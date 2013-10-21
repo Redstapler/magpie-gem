@@ -5,10 +5,10 @@ module Magpie
     validates_presence_of :postal_address
 
     def load_from_model(model)
-      @postal_address = Magpie::PostalAddress.new.load_from_model(model)
-      @latitude = model.location.try(:latitude)
-      @longitude = model.location.try(:longitude)
-      @county = model.county
+      self.postal_address = Magpie::PostalAddress.new.load_from_model(model)
+      self.latitude = model.location.try(:latitude)
+      self.longitude = model.location.try(:longitude)
+      self.county = model.county
 
       self
     end
