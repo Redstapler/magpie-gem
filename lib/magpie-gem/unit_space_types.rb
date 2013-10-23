@@ -9,8 +9,8 @@ module Magpie
 
     def use_types
       unless @use_types
-        self.use_types = @space.use_types.collect(&:name)
-        self.use_types = ["Office"] if use_types.length == 0
+        @use_types = @space.use_types.collect(&:name)
+        @use_types = ["Office"] if use_types.length == 0
       end
       @use_types
     end
