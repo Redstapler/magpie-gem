@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "magpie-gem"
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Amol Kelkar"]
@@ -46,7 +46,6 @@ Gem::Specification.new do |s|
     "lib/magpie-gem/property_space.rb",
     "lib/magpie-gem/property_space_type.rb",
     "lib/magpie-gem/property_space_type_lease.rb",
-    "lib/magpie-gem/property_space_type_office.rb",
     "lib/magpie-gem/property_space_types.rb",
     "lib/magpie-gem/rate.rb",
     "lib/magpie-gem/unit.rb",
