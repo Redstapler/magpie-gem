@@ -1,7 +1,7 @@
 # Magpie class that corresponds with a real database backed model
 module Magpie
   class Entity < Magpie::Base
-    attr_accessor :model, :feed_provider, :id, :changes
+    attr_accessor :model, :feed_provider, :id, :changes, :action
     validates_presence_of :feed_provider, :id
 
     def load_from_model(m)
