@@ -197,6 +197,7 @@ module Magpie
       validate
 
       if @model.changed?
+        @changes = @model.changes
         # Rails.logger.info("!!!! #{@model.class.name} #{@model.feed_id} changed: #{@model.changes} model attributes: #{attrs}")
         @model.save!
         @model.reload
