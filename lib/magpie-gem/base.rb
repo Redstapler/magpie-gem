@@ -156,7 +156,7 @@ module Magpie
           end
         end
       end
-      sanitize_model_attributes(model_attrs).reject{|k,v| v.nil? || v=="null" || v=="nil" || v=="N/A" || v.downcase=="nan"}
+      sanitize_model_attributes(model_attrs).reject{|k,v| v.nil? || v=="null" || v=="nil" || v=="N/A" || v.to_s.downcase=="nan"}
     end
 
     def model_attributes_base
