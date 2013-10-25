@@ -14,11 +14,15 @@ module Magpie
     end
 
     def model_attributes_base
-      {
-        county: @county,
-        location: "POINT(#{@longitude} #{@latitude})"
+      attribs = {
+        county: @county
       }
-    end
 
+      if @longitude.present? && @latitude.present?
+        attribs[:location] = "POINT(#{@longitude} #{@latitude})"
+      end
+
+      attribs
+    end
   end
 end
