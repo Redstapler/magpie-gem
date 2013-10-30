@@ -66,10 +66,10 @@ module Magpie
 
     def as_json(options={})
       {
-        office: @office,
-        retail: @retail,
-        industrial: @industrial
-      }
+        office: @office.as_json,
+        retail: @retail.as_json,
+        industrial: @industrial.as_json
+      }.reject{|k,v| v.nil? || v.empty?}
     end
   end
 end
