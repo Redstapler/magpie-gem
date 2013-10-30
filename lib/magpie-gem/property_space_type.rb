@@ -11,7 +11,7 @@ module Magpie
 
     def initialize
       self.rate = Magpie::Rate.new(nil, nil, nil)
-      self.lease = Magpie::PropertySpaceTypeLease
+      self.lease = Magpie::PropertySpaceTypeLease.new
     end
 
     def load_from_model(building)
