@@ -1,63 +1,88 @@
 module Magpie
   class Feed < Magpie::Base
-    has_many :companies, class: Magpie::Company
-    has_many :people, class: Magpie::Person
-    has_many :properties, class: Magpie::Property
-    has_many :units, class: Magpie::Unit
-    attr_accessor :companies, :people, :properties, :units, :feed_provider
+    each_entity_class {|entity_class, entity_name, entity_name_plural|
 
-    validate do
-      [:companies, :people, :properties, :units].each {|entity_name_plural|
-        self.send(entity_name_plural).each {|entity|
-          prefix = "#{entity.class.name.demodulize.underscore}_#{entity.id}"
-          unless entity.valid?
-            entity.errors.messages.each{|k,v|
+      # e.g. has_many :companies, class: Magpie::Company
+      has_many entity_name_plural, class: entity_class
+
+      # e.g. attr_accessor :companies, :companies_by_id
+      attr_accessor entity_name_plural, "#{entity_name_plural}_by_id"
+
+      # aggregate validation errors from all entity instances in the feed
+      validate do
+        self.send(entity_name_plural).each {|entity_instance|
+          prefix = "#{entity_instance.class.name.demodulize.underscore}_#{entity_instance.id}"
+          unless entity_instance.valid?
+            entity_instance.errors.messages.each{|k,v|
               self.errors.messages[(prefix + ' / ' + k.to_s).to_sym] = v
             }
           end
         }
-      }
-    end
+      end
+
+      # e.g. def companies()
+      define_method(entity_name_plural) do
+        @data[entity_name_plural]
+      end
+
+      # e.g. def companies()
+      define_method("#{entity_name_plural}_by_id") do
+        @data["#{entity_name_plural}_by_id"]
+      end
+
+      # e.g. def add_company(attribs)
+      # adds to both the companies array and companies_by_id hash
+      define_method("add_#{entity_name}") do |attribs={}|
+        attribs[:feed_provider] = self.feed_provider
+        item = entity_class.new.set_attributes(attribs, entity_name)
+        throw "Must specify id in the attributes for add_#{entity_name}" unless item.id.present?
+        self.send("add_#{entity_name}_instance", item)
+      end
+
+      define_method("add_#{entity_name}_instance") do |item|
+        @data[entity_name_plural] << item
+        @data["#{entity_name_plural}_by_id"][item.id] = item
+        item
+      end      
+    }
+
+    attr_accessor :feed_provider
     
     def initialize(attributes={})
       super
-      self.companies = []
-      self.people = []
-      self.properties = []
-      self.units = []
+      @data = {}
+      Magpie::Base.each_entity_class {|entity_class, entity_name, entity_name_plural|
+        # e.g. @companies = []
+        @data[entity_name_plural] = []
+
+        # e.g. @companies_by_id = {}
+        @data["#{entity_name_plural}_by_id"] = {}
+      }
     end
 
     def from_json(json, context=nil)
       obj = JSON.parse(json)
 
-      self.companies = (obj['companies'] || {}).collect{|c| model = Magpie::Company.new; model.set_attributes(c, 'company'); model.feed_provider = obj['feed_provider']; model}
-      self.people = (obj['people'] || {}).collect{|c| model = Magpie::Person.new; model.set_attributes(c, 'person'); model.feed_provider = obj['feed_provider']; model}
-      self.properties = (obj['properties'] || {}).collect{|c| model = Magpie::Property.new; model.set_attributes(c, 'property'); model.feed_provider = obj['feed_provider']; model}
-      self.units = (obj['units'] || {}).collect{|c| model = Magpie::Unit.new; model.set_attributes(c, 'unit'); model.feed_provider = obj['feed_provider']; model}
+      Magpie::Base.each_entity_class {|entity_class, entity_name, entity_name_plural|
+        instances = (obj[entity_name_plural] || {}).collect{|c| model = entity_class.new; model.set_attributes(c, entity_name); model.feed_provider = obj['feed_provider']; model}
+        instances.each {|instance|
+          # add each instance using the add_ method so it gets addes to both the list (e.g. @companies) and the hash (e.g. @companies_by_id)
+          self.send("add_#{entity_name}_instance", instance)
+        }
+      }
       self.feed_provider = obj['feed_provider']
 
       self
     end
 
-    # def self.from_hash(data)
-    #   feed = Magpie::Feed.new data['feed_provider']
-    #   data['companies'].each{|p| feed.companies << Magpie::Company.from_hash(data['feed_provider'], p)} if data['companies'].present?
-    #   data['people'].each{|p| feed.people << Magpie::Person.from_hash(data['feed_provider'], p)} if data['people'].present?
-    #   data['properties'].each{|p| feed.properties << Magpie::Property.from_hash(data['feed_provider'], p)}
-    #   data['units'].each{|u| feed.units << Magpie::Unit.from_hash(data['feed_provider'], u)}
-    #   feed
-    # end
-
-    # def initialize(feed_provider)
-    #   @feed_provider = feed_provider
-    #   @companies = []
-    #   @people = []
-    #   @properties = []
-    #   @units = []
-    # end
-
-    # def as_json(params)
-    #   {feed_provider: @feed_provider, companies: @companies, people: @people, properties: @properties, units: @units}.as_json(params)
-    # end
+    def as_json(options={})
+      {
+        feed_provider: feed_provider,
+        companies: companies,
+        people: people,
+        properties: properties,
+        units: units
+      }
+    end
   end
 end

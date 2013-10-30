@@ -50,5 +50,9 @@ module Magpie
       valid?
       # throw "Validation errors: #{self.errors.full_messages}\nmodel = #{self.inspect}" unless self.errors.messages.count == 0
     end
+
+    def add_media(attribs)
+      self.media << Magpie::Media.new.set_attributes(attribs)
+    end
   end
 end

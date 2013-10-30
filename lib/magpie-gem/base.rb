@@ -206,5 +206,14 @@ module Magpie
         false
       end
     end
+
+    def self.each_entity_class
+      [Magpie::Company, Magpie::Person, Magpie::Property, Magpie::Unit].each {|entity_class|
+        entity_name = entity_class.name.demodulize.underscore
+        entity_name_plural = entity_name.pluralize
+
+        yield entity_class, entity_name, entity_name_plural
+      }
+    end
   end
 end
