@@ -4,8 +4,12 @@ module Magpie
     attr_accessor :postal_address, :latitude, :longitude, :county
     validates_presence_of :postal_address
 
+    def initialize
+      self.postal_address = Magpie::PostalAddress.new
+    end
+
     def load_from_model(model)
-      self.postal_address = Magpie::PostalAddress.new.load_from_model(model)
+      self.postal_address.load_from_model(model)
       self.latitude = model.location.try(:latitude)
       self.longitude = model.location.try(:longitude)
       self.county = model.county

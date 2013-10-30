@@ -6,6 +6,9 @@ module Magpie
 
     DEDUP_ATTRIBUTES = [:email]
 
+    def initialize
+    end
+
     def set_attributes(data, context=nil)
       super(data)
       self.id = @email if @id.blank?

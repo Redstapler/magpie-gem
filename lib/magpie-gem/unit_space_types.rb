@@ -7,6 +7,12 @@ module Magpie
     has_one :industrial, :class => Magpie::UnitSpaceType, :context => 'unit'
     attr_accessor :office, :retail, :industrial
 
+    def initialize
+      @industrial = Magpie::UnitSpaceType.new
+      @office = Magpie::UnitSpaceType.new
+      @retail = Magpie::UnitSpaceType.new
+    end
+
     def use_types
       unless @use_types
         @use_types = @space.use_types.collect(&:name)
@@ -21,28 +27,28 @@ module Magpie
       other_rsf = space.available_rsf - office_rsf
 
       if use_types.length > 0 && use_types[0] == "Industrial"
-        @industrial = Magpie::UnitSpaceType.new.load_from_model(space)
+        @industrial.load_from_model(space)
         @industrial.available = other_rsf
         @industrial.rate = Magpie::Rate.new(space.warehouse_rate, space.min_asking_rate, space.max_asking_rate)
 
         if office_rsf > 0
-          @office = Magpie::UnitSpaceType.new.load_from_model(space)
+          @office.load_from_model(space)
           @office.available = space.office_rsf
           @office.rate = Magpie::Rate.new(space.office_rate, space.min_asking_rate, space.max_asking_rate)
         end
       elsif use_types.length > 0 && use_types[0] == "Retail"
-        @retail = Magpie::UnitSpaceType.new.load_from_model(space)
+        @retail.load_from_model(space)
         @retail.available = other_rsf
         @retail.rate = Magpie::Rate.new(nil, space.min_asking_rate, space.max_asking_rate)
 
         if office_rsf > 0
-          @office = Magpie::UnitSpaceType.new.load_from_model(space)
+          @office.load_from_model(space)
           @office.available = space.office_rsf
           @office.rate = Magpie::Rate.new(space.office_rate, space.min_asking_rate, space.max_asking_rate)
         end
       else
         # only office
-        @office = Magpie::UnitSpaceType.new.load_from_model(space)
+        @office.load_from_model(space)
         @office.available = space.available_rsf
         @office.rate = Magpie::Rate.new(nil, space.min_asking_rate, space.max_asking_rate)
       end

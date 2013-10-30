@@ -2,6 +2,11 @@ module Magpie
   class UnitLease < Magpie::Base
     attr_accessor :leased_on, :lease_expires_on, :listed_on, :sublease, :coworking, :type, :operating_expenses, :tax, :water_sewege, :electrical, :rate
     # has_one :rate, :class => Magpie::Rate, :context => 'unit'
+
+    def initialize
+      self.rate = Magpie::Rate.new(nil, nil, nil)
+    end
+
     def load_from_model(space)
       self.leased_on = space.leased_on
       self.lease_expires_on = space.master_lease_expiration
@@ -27,9 +32,10 @@ module Magpie
       end
 
       if space.min_asking_rate && space.max_asking_rate && space.min_asking_rate != space.max_asking_rate
-        self.rate = Magpie::Rate.new(nil, space.min_asking_rate, space.max_asking_rate)
+        self.rate.min_rate = space.min_asking_rate
+        self.rate.max_rate = space.max_asking_rate
       else 
-        self.rate = Magpie::Rate.new(space.min_asking_rate || space.office_rate || space.warehouse_rate, nil, nil)
+        self.rate.rate = space.min_asking_rate || space.office_rate || space.warehouse_rate
       end
 
       self

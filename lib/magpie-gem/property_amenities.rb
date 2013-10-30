@@ -3,17 +3,18 @@ module Magpie
     attr_accessor :amenities
     def initialize
       self.amenities = HashWithIndifferentAccess.new
+      self.amenities["Paid parking"] = Magpie::PropertyAmenityPaidParking.new
+      self.amenities["Doors"] = Magpie::PropertyAmenityDoors.new
     end
 
     def load_from_model(building)
-      self.amenities = HashWithIndifferentAccess.new({
-        "Paid parking" => Magpie::PropertyAmenityPaidParking.new.load_from_model(building),
-        Sprinklers: building.sprinklers,
-        HVAC: building.hvac,
-        Elevators:  building.elevators,
-        Sewer: building.sewer,
-        Doors: Magpie::PropertyAmenityDoors.new.load_from_model(building)
-      })
+      self.amenities["Paid parking"].load_from_model(building)
+      self.amenities["Sprinklers"] = building.sprinklers
+      self.amenities["HVAC"] = building.hvac
+      self.amenities["Elevators"] =  building.elevators
+      self.amenities["Sewer"] = building.sewer
+      self.amenities["Doors"].load_from_model(building)
+
       building.amenities.each{|a|
         @amenities[a.name] = true
       }

@@ -9,12 +9,16 @@ module Magpie
     ensure_number_precision(:divisible_by, 0)
     ensure_number_precision(:largest_contiguous_space, 0)
 
+    def initialize
+      self.types = Magpie::UnitSpaceTypes.new
+    end
+
     def load_from_model(space)
       self.available = space.available_rsf
       self.divisible_by = space.divisible_rsf
       self.largest_contiguous_space = space.contiguous_rsf
 
-      self.types = Magpie::UnitSpaceTypes.new.load_from_model(space)
+      self.types.load_from_model(space)
 
       self
     end

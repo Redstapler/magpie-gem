@@ -56,10 +56,16 @@ module Magpie
     has_one :industrial, :class => Magpie::PropertySpaceTypeIndustrial, :context => 'property'
     attr_accessor :office, :retail, :industrial
 
+    def initialize
+      self.office = Magpie::PropertySpaceTypeOffice.new
+      self.retail = Magpie::PropertySpaceTypeRetail.new
+      self.industrial = Magpie::PropertySpaceTypeIndustrial.new
+    end
+
     def load_from_model(space)
-      self.office = Magpie::PropertySpaceTypeOffice.new.load_from_model(space)
-      self.retail = Magpie::PropertySpaceTypeRetail.new.load_from_model(space)
-      self.industrial = Magpie::PropertySpaceTypeIndustrial.new.load_from_model(space)
+      self.office.load_from_model(space)
+      self.retail.load_from_model(space)
+      self.industrial.load_from_model(space)
 
       self
     end

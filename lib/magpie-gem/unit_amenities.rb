@@ -4,14 +4,13 @@ module Magpie
 
     def initialize
       self.amenities = HashWithIndifferentAccess.new
+      self.amenities['Doors'] = Magpie::UnitAmenityDoors.new
     end
 
     def load_from_model(space)
-      self.amenities = HashWithIndifferentAccess.new({
-        Sprinklers: space.sprinklers,
-        Furnished: space.furnished,
-        Doors: Magpie::UnitAmenityDoors.new.load_from_model(space)
-      })
+      self.amenities['Sprinklers'] = space.sprinklers
+      self.amenities['Furnished'] = space.furnished
+      self.amenities['Doors'].load_from_model(space)
       self
     end
 

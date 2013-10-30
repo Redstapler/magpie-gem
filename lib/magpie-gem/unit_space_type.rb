@@ -5,6 +5,10 @@ module Magpie
     attr_accessor :available, :rate    
     ensure_number_precision(:available, 0)
 
+    def initialize
+      self.rate = Magpie::Rate.new(nil, nil, nil)
+    end
+
     def load_from_model(space)
       self
     end

@@ -10,11 +10,15 @@ module Magpie
 
     validates_presence_of :name
 
+    def initialize
+      self.postal_address = Magpie::PostalAddress.new
+    end
+
     def load_from_model(company)
       super
       self.id = company.feed_id || company.name
       self.name = company.name
-      self.postal_address = Magpie::PostalAddress.new.load_from_model(company)
+      self.postal_address.load_from_model(company)
       self.phone = company.phone
       self.fax = company.fax
       self.email = company.email

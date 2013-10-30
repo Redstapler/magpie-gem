@@ -9,15 +9,21 @@ module Magpie
     ensure_number_precision(:specific_rate, 4)
     ensure_number_precision(:total, 4)
 
+    def initialize
+      self.rate = Magpie::Rate.new(nil, nil, nil)
+      self.lease = Magpie::PropertySpaceTypeLease
+    end
+
     def load_from_model(building)
       # fill in only if total is present for this type of space
       return if @total.nil? || @total <= 0
 
-      self.lease = Magpie::PropertySpaceTypeLease.new.load_from_model(building)
+      self.lease.load_from_model(building)
       if @specific_rate.present?
-        self.rate = Magpie::Rate.new(@specific_rate, nil, nil)
+        self.rate.rate = @specific_rate
       else
-        self.rate = Magpie::Rate.new(nil, building.min_asking_rate, building.max_asking_rate)
+        self.rate.min_rate = building.min_asking_rate
+        self.rate.max_rate = building.max_asking_rate
       end
 
       self

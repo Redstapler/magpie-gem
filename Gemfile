@@ -12,4 +12,12 @@ group :development do
   # gem "jeweler", "~> 1.8.7"
   gem "simplecov", ">= 0"
   gem "activemodel", ">= 3.1.12"
+  gem "spork"
+  gem "guard"
+  gem 'guard-bundler'
+  gem 'guard-rspec'
+  gem 'guard-spork'
+  gem 'guard-pow'
+  gem 'guard-ctags-bundler'
+  gem 'factory_girl'
 end

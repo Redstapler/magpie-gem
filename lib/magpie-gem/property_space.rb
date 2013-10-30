@@ -9,12 +9,13 @@ module Magpie
     
     def initialize
       self.types = Magpie::PropertySpaceTypes.new
+      self.largest_contiguous_space = Magpie::PropertyLcs.new
     end
 
     def load_from_model(building)
       self.typical_floor_size = building.typical_floor_size
-      self.largest_contiguous_space = Magpie::PropertyLcs.new.load_from_model(building)
-      self.types = Magpie::PropertySpaceTypes.new.load_from_model(building)
+      self.largest_contiguous_space.load_from_model(building)
+      self.types.load_from_model(building)
 
       self
     end

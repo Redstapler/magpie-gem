@@ -16,6 +16,15 @@ module Magpie
     has_one :lease, :class => Magpie::UnitLease
     has_many :media, :class => Magpie::Media
     has_one :amenities, :class => Magpie::UnitAmenities, :context => 'unit'
+
+    def initialize
+      self.contacts = []
+      self.space = Magpie::UnitSpace.new
+      self.lease = Magpie::UnitLease.new
+      self.media = []
+      self.amenities = Magpie::UnitAmenities.new
+    end
+
     def load_from_model(space)
       super(space)
 
@@ -24,10 +33,10 @@ module Magpie
       self.status = space.status
       self.available_on = space.available_on
       self.contacts = Magpie::Contact.load_contacts_from_model(space)
-      self.space = Magpie::UnitSpace.new.load_from_model(space)
-      self.lease = Magpie::UnitLease.new.load_from_model(space)
+      self.space.load_from_model(space)
+      self.lease.load_from_model(space)
       self.media = Magpie::Media.load_medias_from_model(space)
-      self.amenities = Magpie::UnitAmenities.new.load_from_model(space)
+      self.amenities.load_from_model(space)
 
       self.property = Magpie::Property.new.load_from_model(space.building)
       self

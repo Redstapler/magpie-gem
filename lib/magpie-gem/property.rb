@@ -22,6 +22,18 @@ module Magpie
     has_many :contacts, :class => Magpie::Contact
     has_one :amenities, :class => Magpie::PropertyAmenities, :context => 'property'
 
+    def initialize
+      self.location = Magpie::Location.new
+      self.land = Magpie::PropertyLand.new
+      self.built = Magpie::PropertyBuilt.new
+      self.sale = Magpie::PropertySale.new
+      self.space = Magpie::PropertySpace.new
+      self.media = []
+      self.floor_load_ratio = Magpie::PropertyFloorLoadRatio.new
+      self.amenities = Magpie::PropertyAmenities.new
+      self.contacts = []
+    end
+
     def load_from_model(building)
       super(building)
       self.name = building.name
@@ -32,14 +44,14 @@ module Magpie
       # management_company_id: building.management_company_id,
       self.zoning = building.zoning
       self.tax_id_number = building.parcel
-      self.location = Magpie::Location.new.load_from_model(building)
-      self.land = Magpie::PropertyLand.new.load_from_model(building)
-      self.built = Magpie::PropertyBuilt.new.load_from_model(building)
-      self.sale = Magpie::PropertySale.new.load_from_model(building)
-      self.space = Magpie::PropertySpace.new.load_from_model(building)
+      self.location.load_from_model(building)
+      self.land.load_from_model(building)
+      self.built.load_from_model(building)
+      self.sale.load_from_model(building)
+      self.space.load_from_model(building)
       self.media = Magpie::Media.load_medias_from_model(building)
-      self.floor_load_ratio = Magpie::PropertyFloorLoadRatio.new.load_from_model(building)
-      self.amenities = Magpie::PropertyAmenities.new.load_from_model(building)
+      self.floor_load_ratio.load_from_model(building)
+      self.amenities.load_from_model(building)
       self.contacts = Magpie::Contact.load_contacts_from_model(building)
 
       self
