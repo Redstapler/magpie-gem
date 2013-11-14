@@ -64,6 +64,10 @@ module Magpie
       case @status
       when 'Lease Pending'
         'lease_pending'
+      when 'Vacant'
+        'vacant'
+      when 'Leased'
+        'leased'
       else
         'available'
       end
