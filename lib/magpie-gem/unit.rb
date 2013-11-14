@@ -47,7 +47,8 @@ module Magpie
         floor: @floor,
         suite: @suite,
         status: status,
-        available_on: @available_on
+        available_on: @available_on,
+        visibility: 'published'
       })
     end
 
