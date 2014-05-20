@@ -25,6 +25,7 @@ module Magpie
       self.default_role = person.default_role
 
       self.company = Magpie::Company.new.load_from_model(person.company)
+      self.company_id = self.company.id
 
       self
     end
