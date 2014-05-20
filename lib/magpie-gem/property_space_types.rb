@@ -62,16 +62,16 @@ module Magpie
       self.industrial = Magpie::PropertySpaceTypeIndustrial.new
     end
 
-    def load_from_model(space)
-      self.office.load_from_model(space)
-      self.retail.load_from_model(space)
-      self.industrial.load_from_model(space)
+    def load_from_model(building)
+      self.office.load_from_model(building)
+      self.retail.load_from_model(building)
+      self.industrial.load_from_model(building)
 
       self
     end
 
     def from_json(json, context=nil)
-      obj = JSON.parse(json).slice(:office, :retail, :industrial)
+      obj = JSON.parse(json).slice("office", "retail", "industrial")
       self.set_attributes(obj, context)
       self
     end
