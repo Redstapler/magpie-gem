@@ -14,10 +14,11 @@ module Magpie
     def from_json(json, context=nil)
       obj = JSON.parse(json)
       if obj.is_a? Hash
-        self.min_rate = obj[:min]
-        self.max_rate = obj[:max]
+        obj = HashWithIndifferentAccess.new obj
+        self.min_rate = obj[:min].to_f
+        self.max_rate = obj[:max].to_f
       else
-        self.rate = obj
+        self.rate = obj.to_f
       end
       self.rate ||= self.min_rate
       self.min_rate ||= self.rate

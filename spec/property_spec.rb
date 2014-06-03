@@ -6,7 +6,7 @@ describe "Magpie::Property" do
     property = Magpie::Property.new
     property.name = "property 1"
 
-    property.to_json.should == '{}'
+    property.to_json.should == "{\"name\":\"property 1\"}"
   end
 
 end

@@ -41,6 +41,12 @@ module Magpie
       self
     end
 
+    def from_json(json, context=nil)
+      super
+      self.rate = Magpie::Rate.new.from_json(JSON.parse(json)["rate"].to_json)
+      self
+    end
+
     def model_attributes_base
       if @rate.present? && @rate.is_a?(Numeric)
         self.rate = Magpie::Rate.new(@rate, nil, nil)
