@@ -26,7 +26,7 @@ module Magpie
       self
     end
 
-    def as_json(options)
+    def as_json(options = nil)
       if @rate.present?
         @rate
       else
