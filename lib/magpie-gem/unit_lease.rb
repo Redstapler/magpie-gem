@@ -1,7 +1,7 @@
 module Magpie
   class UnitLease < Magpie::Base
     attr_accessor :leased_on, :lease_expires_on, :listed_on, :sublease, :coworking, :type, :operating_expenses, :tax, :water_sewege, :electrical, :rate
-    # has_one :rate, :class => Magpie::Rate, :context => 'unit'
+    has_one :rate, :class => Magpie::Rate, :context => 'unit'
 
     def initialize
       self.rate = Magpie::Rate.new(nil, nil, nil)
