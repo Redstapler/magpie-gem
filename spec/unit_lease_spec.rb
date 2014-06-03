@@ -10,6 +10,7 @@ describe "Magpie::UnitLease" do
 
     it "has correct rate" do
       subject.rate.min_rate.should == 1.0
+      subject.rate.max_rate.should == nil
       subject.rate.rate.should == 1.0
     end
 

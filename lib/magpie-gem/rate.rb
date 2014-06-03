@@ -16,7 +16,7 @@ module Magpie
       if obj.is_a? Hash
         obj = HashWithIndifferentAccess.new obj
         self.min_rate = obj[:min].to_f
-        self.max_rate = obj[:max].to_f
+        self.max_rate = obj[:max].to_f unless obj[:max].nil?
       else
         self.rate = obj.to_f
       end
