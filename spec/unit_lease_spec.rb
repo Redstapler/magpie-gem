@@ -14,5 +14,9 @@ describe "Magpie::UnitLease" do
       subject.rate.rate.should == 1.0
     end
 
+    it "generates correct json" do
+      subject.to_json.should == "{\"rate\":1.0,\"type\":\"NNN\"}"
+    end
+
   end
 end

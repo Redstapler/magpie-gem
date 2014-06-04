@@ -12,7 +12,7 @@ module Magpie
     end
 
     def from_json(json, context=nil)
-      obj = json.include?('{') ? JSON.parse(json) : json.to_f
+      obj = json.include?('{') ? JSON.parse(json) : json.gsub('"','').to_f
       if obj.is_a? Hash
         obj = HashWithIndifferentAccess.new obj
         self.max_rate = (obj[:max].present? && obj[:max].to_f) || nil

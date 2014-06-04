@@ -5,11 +5,12 @@ describe "Magpie::Rate" do
     {name: "only min rate", json: "{\"min\":\"1.0\"}", min_rate: 1.0, max_rate: nil, rate: 1.0, to_json: "1.0"},
     {name: "only max rate", json: "{\"max\":\"1.0\"}", min_rate: 1.0, max_rate: 1.0, rate: 1.0, to_json: "1.0"},
     {name: "both min and rates", json: "{\"max\":\"4.0\", \"min\":\"1.0\"}", min_rate: 1.0, max_rate: 4.0, rate: nil, to_json: "{\"min\":1.0,\"max\":4.0}"},
-    {name: "only rate", json: "1.0", min_rate: 1.0, max_rate: nil, rate: 1.0, to_json: "1.0"},
+    {name: "only rate", json: "\"1.0\"", min_rate: 1.0, max_rate: nil, rate: 1.0, to_json: "1.0"},
 
     {name: "only min rate (float values)", json: "{\"min\":1.0}", min_rate: 1.0, max_rate: nil, rate: 1.0, to_json: "1.0"},
     {name: "only max rate (float values)", json: "{\"max\":1.0}", min_rate: 1.0, max_rate: 1.0, rate: 1.0, to_json: "1.0"},
     {name: "both min and rates (float values)", json: "{\"max\":4.0, \"min\":1.0}", min_rate: 1.0, max_rate: 4.0, rate: nil, to_json: "{\"min\":1.0,\"max\":4.0}"},
+    {name: "only rate (float values)", json: "1.0", min_rate: 1.0, max_rate: nil, rate: 1.0, to_json: "1.0"},
 
   ].each do |test|
     context test[:name] do
