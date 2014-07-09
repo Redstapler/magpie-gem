@@ -1,13 +1,15 @@
 module Magpie
   class UnitLease < Magpie::Base
-    attr_accessor :leased_on, :lease_expires_on, :listed_on, :sublease, :coworking, :type, :operating_expenses, :tax, :water_sewege, :electrical, :rate
+    attr_accessor :for_lease, :leased_on, :lease_expires_on, :listed_on, :sublease, :coworking, :type, :operating_expenses, :tax, :water_sewege, :electrical, :rate
     has_one :rate, :class => Magpie::Rate, :context => 'unit'
 
     def initialize
       self.rate = Magpie::Rate.new(nil, nil, nil)
+      self.for_lease = true
     end
 
     def load_from_model(space)
+      self.for_lease = [:available, :vacant, :lease_pending].include? space.status.to_sym
       self.leased_on = space.leased_on
       self.lease_expires_on = space.master_lease_expiration
       self.listed_on = space.listed_on
@@ -53,6 +55,7 @@ module Magpie
       end
 
       {
+        # status: @for_lease ? :available : :leased,   # to ensure proper state transitions call space.lease or space.make_available from magpie importer
         leased_on: @leased_on,
         master_lease_expiration: @lease_expires_on,
         listed_on: @listed_on,
