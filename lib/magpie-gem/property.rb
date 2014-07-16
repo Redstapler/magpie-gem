@@ -11,7 +11,7 @@ module Magpie
   class Property < Magpie::Entity
     DEDUP_ATTRIBUTES = [:address, :city, :state]
 
-    attr_accessor :name, :description, :zoning, :tax_id_number, :location, :land, :built, :sale, :space, :media, :amenities, :floor_load_ratio, :contacts
+    attr_accessor :for_lease, :name, :description, :zoning, :tax_id_number, :location, :land, :built, :sale, :space, :media, :amenities, :floor_load_ratio, :contacts
     has_one :location, :class => Magpie::Location
     has_one :land, :class => Magpie::PropertyLand
     has_one :built, :class => Magpie::PropertyBuilt
@@ -23,6 +23,7 @@ module Magpie
     has_one :amenities, :class => Magpie::PropertyAmenities, :context => 'property'
 
     def initialize
+      self.for_lease = true
       self.location = Magpie::Location.new
       self.land = Magpie::PropertyLand.new
       self.built = Magpie::PropertyBuilt.new
@@ -38,6 +39,7 @@ module Magpie
       super(building)
       self.name = building.name
       self.description = building.comment
+      self.for_lease = :published.eql? building.visibility.to_sym
       # updated_at: building.updated_at,
       # active: building.active,
       # owner_company_id: building.owner_company_id,
