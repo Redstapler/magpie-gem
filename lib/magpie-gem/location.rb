@@ -13,7 +13,7 @@ module Magpie
       self.latitude = model.location.try(:latitude)
       self.longitude = model.location.try(:longitude)
       self.county = model.county
-      self.formatted_long_address = model.location.try(:formatted_long_address)
+      self.formatted_long_address = model.formatted_long_address
 
       self
     end
@@ -26,9 +26,7 @@ module Magpie
       if @longitude.present? && @latitude.present?
         attribs[:location] = "POINT(#{@longitude} #{@latitude})"
       end
-      if @formatted_long_address.present?
-        attribs[:formatted_long_address] = @formatted_long_address
-      end
+      attribs[:formatted_long_address] = @formatted_long_address
       attribs
     end
   end
