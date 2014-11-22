@@ -11,7 +11,7 @@ module Magpie
   class Property < Magpie::Entity
     DEDUP_ATTRIBUTES = [:formatted_long_address]
 
-    attr_accessor :for_lease, :name, :description, :zoning, :tax_id_number, :location, :land, :built, :sale, :space, :media, :amenities, :floor_load_ratio, :contacts
+    attr_accessor :for_lease, :name, :description, :zoning, :tax_id_number, :location, :land, :built, :sale, :space, :media, :amenities, :floor_load_ratio, :contacts, :locked_listing
     has_one :location, :class => Magpie::Location
     has_one :land, :class => Magpie::PropertyLand
     has_one :built, :class => Magpie::PropertyBuilt
@@ -33,6 +33,7 @@ module Magpie
       self.floor_load_ratio = Magpie::PropertyFloorLoadRatio.new
       self.amenities = Magpie::PropertyAmenities.new
       self.contacts = []
+      self.locked_listing = false
     end
 
     def load_from_model(building)
@@ -40,6 +41,7 @@ module Magpie
       self.name = building.name
       self.description = building.comment
       self.for_lease = :published.eql? building.visibility.to_sym
+      self.locked_listing = building.locked_listing
       # updated_at: building.updated_at,
       # active: building.active,
       # owner_company_id: building.owner_company_id,
@@ -55,7 +57,6 @@ module Magpie
       self.floor_load_ratio.load_from_model(building)
       self.amenities.load_from_model(building)
       self.contacts = Magpie::Contact.load_contacts_from_model(building)
-
       self
     end
 
