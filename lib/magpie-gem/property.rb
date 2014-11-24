@@ -65,7 +65,8 @@ module Magpie
         name: @name,
         comment: @description,
         zoning: @zoning,
-        parcel: @tax_id_number
+        parcel: @tax_id_number,
+        locked_listing: @locked_listing
       })
     end
 

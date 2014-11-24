@@ -129,6 +129,13 @@ module Magpie
         # Skip if the building is found in the database independent of the feed provider (manually added, etc.)
         lookup_attributes = model_attributes.slice(*self.class::DEDUP_ATTRIBUTES)
         if lookup_attributes.values.compact.length > 0
+          # Looks up if the dedup attributes match along with the same feed provider
+          m = self.class::MODEL_CLASS.where("feed_id is null and feed_provider = '#{@feed_provider}'").where(lookup_attributes).first
+          if m.present?
+            @model = m
+            return :skip_override if m.feed_override
+            return :ready
+          end
           b = self.class::MODEL_CLASS.where("feed_provider is null or feed_provider != '#{@feed_provider}'").where(lookup_attributes).first
           if b
             @model = b
