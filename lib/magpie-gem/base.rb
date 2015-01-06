@@ -136,7 +136,7 @@ module Magpie
             return :skip_override if m.feed_override
             return :ready
           end
-          b = self.class::MODEL_CLASS.where("feed_provider is null or feed_provider != '#{@feed_provider}'").where(lookup_attributes).first
+          b = self.class::MODEL_CLASS.where(lookup_attributes).first
           if b
             @model = b
             return :skip_independent

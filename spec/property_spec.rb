@@ -6,7 +6,7 @@ describe "Magpie::Property" do
     property = Magpie::Property.new
     property.name = "property 1"
 
-    property.to_json.should == "{\"for_lease\":true,\"name\":\"property 1\"}"
+    property.to_json.should == "{\"for_lease\":true,\"locked_listing\":false,\"name\":\"property 1\"}"
   end
 
 end
