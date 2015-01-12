@@ -136,6 +136,15 @@ module Magpie
             return :skip_override if m.feed_override
             return :ready
           end
+          
+          # Check to see if it is a duplicate but not from any feed
+          m = self.class::MODEL_CLASS.where("feed_provider is null").where(lookup_attributes).first
+          if m.present?
+            @model = m
+            return :skip_override if m.feed_override
+            return :skip_manual_input
+          end
+
           b = self.class::MODEL_CLASS.where(lookup_attributes).first
           if b
             @model = b
