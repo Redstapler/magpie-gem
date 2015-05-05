@@ -77,10 +77,10 @@ module Magpie
       case @last_updated
       when String
         DateTime.parse(@last_updated)
-      when Time, Date
+      when Time, Date, nil
         @last_updated
       else
-        nil
+        raise TypeError, "#{@last_updated.class} can not be coerced into Time"
       end
     end
 
