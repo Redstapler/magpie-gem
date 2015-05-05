@@ -80,7 +80,7 @@ module Magpie
       when Time, Date, nil
         @last_updated
       else
-        raise TypeError, "#{@last_updated.class} can not be coerced into Time"
+        raise TypeError, "Unhandled last_updated type of class: #{@last_updated.class} "
       end
     end
 
