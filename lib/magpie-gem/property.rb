@@ -11,7 +11,9 @@ module Magpie
   class Property < Magpie::Entity
     DEDUP_ATTRIBUTES = [:formatted_long_address]
 
-    attr_accessor :for_lease, :name, :description, :zoning, :tax_id_number, :location, :land, :built, :sale, :space, :media, :amenities, :floor_load_ratio, :contacts, :locked_listing
+    attr_accessor :for_lease, :name, :description, :zoning, :tax_id_number, :location, :land, :built, :sale, :space,
+                  :media, :amenities, :floor_load_ratio, :contacts, :locked_listing
+    attr_writer :last_updated
     has_one :location, :class => Magpie::Location
     has_one :land, :class => Magpie::PropertyLand
     has_one :built, :class => Magpie::PropertyBuilt
@@ -66,8 +68,20 @@ module Magpie
         comment: @description,
         zoning: @zoning,
         parcel: @tax_id_number,
-        locked_listing: @locked_listing
+        locked_listing: @locked_listing,
+        modified_on: last_updated
       })
+    end
+
+    def last_updated
+      case @last_updated
+      when String
+        DateTime.parse(@last_updated)
+      when Time, Date, nil
+        @last_updated
+      else
+        raise TypeError, "Unhandled last_updated type of class: #{@last_updated.class} "
+      end
     end
 
     def sanitize_model_attributes(attrs)
