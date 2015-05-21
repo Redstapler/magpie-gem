@@ -1,7 +1,3 @@
-#TODO
-#
-# Add a lease pending boolean on object
-
 module Magpie
   class UnitLease < Magpie::Base
     WHATS_INCLUDE_HASH = {}.tap do |h|
@@ -45,7 +41,7 @@ module Magpie
     end
 
     def whats_included(type)
-      WHATS_INCLUDE_HASH(type)
+      WHATS_INCLUDE_HASH[type]
     end
 
     def from_json(json, context=nil)
