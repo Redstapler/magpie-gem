@@ -1,10 +1,12 @@
 require File.expand_path(File.dirname(__FILE__) + '../../extensions/enumerable.rb')
 require 'active_model'
 require 'active_support/core_ext/hash/indifferent_access'
+require_relative 'concerns/serialization'
+require_relative 'concerns/validations'
 module Magpie
   class Base
-    include ActiveModel::Serializers::JSON
-    include ActiveModel::Validations
+    include Validations
+    include Serialization
     include ActiveModel::Conversion
     extend ActiveModel::Naming
 
@@ -12,21 +14,6 @@ module Magpie
 
     @@relationship_classes = HashWithIndifferentAccess.new
 
-    validate do
-      attributes.except(*exclude_from_model_attributes).each do |attr, value|
-        if value.is_a? Magpie::Base
-          unless value.valid?
-            prefix = self.class.name.demodulize.underscore
-            if self.is_a? Magpie::Entity
-              prefix = "#{prefix}_#{@id}"
-            end
-            value.errors.messages.each{|k,v|
-              self.errors.messages[(prefix + ' / ' + k.to_s).to_sym] = v
-            }
-          end
-        end
-      end
-    end
 
     def self.attr_accessor(*vars)
       @attributes ||= []
@@ -54,7 +41,7 @@ module Magpie
 
     def self.ensure_number_precision(attrib, precision)
       define_method("#{attrib}=") do |value|
-        if value.present? && value.is_a?(Numeric)
+        if value.try(:is_a?, Numeric)
           self.instance_variable_set("@#{attrib}", value.round(precision))
         else
           self.instance_variable_set("@#{attrib}", value)
@@ -69,7 +56,8 @@ module Magpie
     def set_attributes(data, context = nil)
       # puts "#{self.class.name} set_attributes with context #{context}"
       data.each do |key, value|
-        if value.is_a? Hash
+        case value
+        when Hash
           item_class = @@relationship_classes["#{context}#{key}"] || @@relationship_classes[key]
           # puts "key = #{key}, item_class = #{item_class}"
           if item_class
@@ -78,7 +66,7 @@ module Magpie
           end
 
           instance_variable_set("@#{key}", value)
-        elsif value.is_a? Array
+        when Array
           item_class = @@relationship_classes["#{context}#{key}"] || @@relationship_classes[key]
 
           arr = value
@@ -109,68 +97,25 @@ module Magpie
       instance_values
     end
 
-    def as_json(options={})
-      options ||= {}
-      options[:except] = ((options[:except] || []) << [:errors, :validation_context, :model_class, :precisions]).flatten
-      super.as_json(options).clean!
-    end
 
-    def from_json(json, context=nil)
-      obj = JSON.parse(json)
-      self.set_attributes(obj, context)
-      self
-    end
-
-    def prepare_model_for_save
-      if @model ||= lookup_model
-        return :skip_override if @model.feed_override # We own it now, so don't let feed update it
-        @model.reload
-      elsif self.class::DEDUP_ATTRIBUTES
-        # Skip if the building is found in the database independent of the feed provider (manually added, etc.)
-        lookup_attributes = model_attributes.slice(*self.class::DEDUP_ATTRIBUTES)
-        if lookup_attributes.values.compact.length > 0
-          # Looks up if the dedup attributes match along with the same feed provider
-          m = self.class::MODEL_CLASS.where("feed_id is null and feed_provider = '#{@feed_provider}'").where(lookup_attributes).first
-          if m.present?
-            @model = m
-            return :skip_override if m.feed_override
-            return :ready
-          end
-          
-          # Check to see if it is a duplicate but not from any feed
-          m = self.class::MODEL_CLASS.where("feed_provider is null").where(lookup_attributes).first
-          if m.present?
-            @model = m
-            return :skip_override if m.feed_override
-            return :skip_manual_input
-          end
-
-          b = self.class::MODEL_CLASS.where(lookup_attributes).first
-          if b
-            @model = b
-            return :skip_independent
-          end
-        end
-      end
-
-      return :ready
-    end
-    
     def model_attributes(level=0)
       # puts "#{'-'*level} Calling model_attributes for #{self.class}"
       model_attrs = model_attributes_base
       attributes.except(*exclude_from_model_attributes).each do |attr, value|
-        if value.is_a? Magpie::Base
+
+        case value
+        when Magpie::Base
           model_attrs.merge! value.model_attributes(level+1)
-        elsif value.is_a? Array
+        when Array
           value.each do |item|
             model_attrs.merge! item.model_attributes(level+1) if item.is_a? Magpie::Base
           end
-        elsif value.is_a? Hash
+        when Hash
           value.each do |k, v|
             model_attrs.merge! v.model_attributes(level+1) if v.is_a? Magpie::Base
           end
         end
+
       end
       sanitize_model_attributes(model_attrs).reject{|k,v| v.nil? || v=="null" || v=="nil" || v=="N/A" || v.to_s.downcase=="nan" || v == "POINT( )"}
     end
@@ -187,41 +132,6 @@ module Magpie
       attrs
     end
 
-    def save(options={})
-      action = prepare_model_for_save
-      if action == :ready
-        ActiveRecord::Base.transaction do
-          action = do_save(options)
-        end
-      end
-
-      action
-    end
-
-    def save_model
-      # Rails.logger.info("=> @model = #{@model.inspect}")
-      # Rails.logger.info("=> attributes = #{model_attributes}")
-      attrs = model_attributes
-      attrs.each{|k,v|
-        if v.present? && v.is_a?(Numeric)
-          attrs[k] = v.to_s
-        end
-      }
-        
-      @model.assign_attributes(attrs, without_protection: true)
-      # Rails.logger.info("<== @model = #{@model.inspect}")
-      validate
-
-      if @model.changed?
-        @changes = @model.changes
-        # Rails.logger.info("!!!! #{@model.class.name} #{@model.feed_id} changed: #{@model.changes} model attributes: #{attrs}")
-        @model.save!
-        @model.reload
-        true
-      else
-        false
-      end
-    end
 
     def self.each_entity_class
       [Magpie::Company, Magpie::Person, Magpie::Property, Magpie::Unit].each {|entity_class|
@@ -231,5 +141,6 @@ module Magpie
         yield entity_class, entity_name, entity_name_plural
       }
     end
+
   end
 end

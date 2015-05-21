@@ -7,7 +7,8 @@ require 'magpie-gem/unit_amenities.rb'
 module Magpie
   class Unit < Magpie::Entity
     DEDUP_ATTRIBUTES = nil
-    
+    STATUS_VALUES = ["On Market", "Off Market", "Available"]
+
     attr_accessor :property
 
     attr_accessor :property_id, :floor, :suite, :status, :available_on, :contacts, :space, :lease, :media, :amenities
@@ -16,6 +17,11 @@ module Magpie
     has_one :lease, :class => Magpie::UnitLease
     has_many :media, :class => Magpie::Media
     has_one :amenities, :class => Magpie::UnitAmenities, :context => 'unit'
+
+    validates :status, inclusion: {
+      in: STATUS_VALUES,
+      message: "'%{value}' is not a valid status: #{ STATUS_VALUES.inspect }"
+    }
 
     def initialize
       self.contacts = []
@@ -44,11 +50,10 @@ module Magpie
 
     def model_attributes_base
       super.merge({
-        floor: @floor,
-        suite: @suite,
+        floor: floor,
+        suite: suite,
         status: status,
-        available_on: @available_on,
-        visibility: 'published'
+        available_on: available_on,
       })
     end
 
@@ -56,21 +61,5 @@ module Magpie
       ['property']
     end
 
-    def parse_date(d)
-      d.to_s.match(%r{\d{4}\-\d{1,2}\-\d{1,2}}) ? Date.strptime(d.to_s, '%Y-%m-%d') : nil
-    end
-
-    def status
-      case @status
-      when 'Lease Pending'
-        'lease_pending'
-      when 'Vacant'
-        'vacant'
-      when 'Leased'
-        'leased'
-      else
-        'available'
-      end
-    end
   end
 end
