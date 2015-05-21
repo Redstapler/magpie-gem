@@ -7,7 +7,7 @@ require 'magpie-gem/unit_amenities.rb'
 module Magpie
   class Unit < Magpie::Entity
     DEDUP_ATTRIBUTES = nil
-    STATUS_VALUES = ["On Market", "Off Market", "Available"]
+    STATUS_VALUES = ["On Market", "Off Market", "Available", "Lease Pending", "Leased"]
 
     attr_accessor :property
 
