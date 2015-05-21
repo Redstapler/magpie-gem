@@ -11,7 +11,10 @@ module Magpie
 
     # To json with validations
     def to_json(options = {})
-      raise Validations::Error.new(self) unless valid?
+      unless options.delete(:skip_validations)
+        raise Validations::Error.new(self) unless valid?
+      end
+
       super
     end
 

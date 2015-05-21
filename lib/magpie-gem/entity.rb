@@ -60,6 +60,7 @@ module Magpie
 
     def save_model(options = {})
       assign_attributes_to_model(build_attrs(options))
+      yield(self.model) if block_given?
       return false unless self.model.changed?
       self.changes = self.model.changes
       self.model.save!

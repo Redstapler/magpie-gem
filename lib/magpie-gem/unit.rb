@@ -7,7 +7,6 @@ require 'magpie-gem/unit_amenities.rb'
 module Magpie
   class Unit < Magpie::Entity
     DEDUP_ATTRIBUTES = nil
-    STATUS_VALUES = ["On Market", "Off Market", "Available", "Lease Pending", "Leased"]
 
     attr_accessor :property
 
@@ -18,9 +17,27 @@ module Magpie
     has_many :media, :class => Magpie::Media
     has_one :amenities, :class => Magpie::UnitAmenities, :context => 'unit'
 
+    class << self
+      def import_status_values
+        @import_status_values ||= ["Off Market", "Available", "Lease Pending", "Leased", "Vacant"].freeze
+      end
+
+      def osnext_status_values
+        @osnext_status_values ||= []
+      end
+
+      def osnext_status_values=(value)
+        @osnext_status_values = value
+      end
+
+      def status_values
+        import_status_values + osnext_status_values
+      end
+    end
+
     validates :status, inclusion: {
-      in: STATUS_VALUES,
-      message: "'%{value}' is not a valid status: #{ STATUS_VALUES.inspect }"
+      in: proc { status_values },
+      message: proc { "'%{value}' is not a valid status: #{ status_values.inspect }" }
     }
 
     def initialize
