@@ -16,18 +16,25 @@ module Magpie
 
 
     def self.attr_accessor(*vars)
-      @attributes ||= []
-      @attributes.concat( vars )
+      add_attributes(vars)
       super
     end
 
+    def self.add_attributes(*vars)
+      attributes.concat( vars.flatten )
+    end
+
     def self.attributes
-      @attributes
+      @attributes ||= []
+    end
+
+    def self.attribute?(attrib)
+      attributes.include?(attrib.to_sym)
     end
 
     def initialize(attributes={})
-      attributes && attributes.each do |name, value|
-        send("#{name}=", value) if respond_to? name.to_sym 
+      attributes.try(:each) do |name, value|
+        set_attribute(name, value) if self.class.attribute?(name)
       end
     end
 
@@ -35,54 +42,84 @@ module Magpie
       false
     end
 
+    def self.raise_unless_attribute(attrib)
+      raise NameError, "Undefined attribute :#{ attrib } for #{ self.name }" unless attribute?(attrib)
+    end
+
     def self.inspect
       "#<#{ self.to_s} #{ self.attributes.collect{ |e| ":#{ e }" }.join(', ') }>"
     end
 
     def self.ensure_number_precision(attrib, precision)
-      define_method("#{attrib}=") do |value|
-        if value.try(:is_a?, Numeric)
-          self.instance_variable_set("@#{attrib}", value.round(precision))
-        else
-          self.instance_variable_set("@#{attrib}", value)
-        end
+      setter_with_feature(attrib, __callee__) do |value|
+        value.is_a?(Numeric) ? value.round(precision) : value
       end
+    end
+
+    def self.setter_with_feature(attrib, feature_name)
+      define_method("#{ attrib }_with_#{ feature_name }=") do |value|
+        set_attribute("#{ attrib }_without_#{ feature_name }", yield(value))
+      end
+      alias_method_chain "#{ attrib }=", feature_name
+    end
+
+    def self.getter_with_feature(attrib, feature_name)
+      define_method("#{ attrib }_with_#{ feature_name }") do |value|
+        yield public_send("#{ attrib }_without_#{ feature_name }")
+      end
+      alias_method_chain "#{ attrib }", feature_name
     end
 
     def attributes=(data)
       set_attributes(data, nil)
     end
 
-    def set_attributes(data, context = nil)
-      # puts "#{self.class.name} set_attributes with context #{context}"
+    def set_attribute(attribute_name, value, options = {})
+      method = "#{attribute_name}="
+      return send(method, value) if respond_to? method
+
+      if options[:strict]
+        self.class.raise_unless_attribute(attribute_name)
+      else
+        instance_variable_set("@#{ attribute_name }", value)
+      end
+    end
+
+    def set_attributes(data, options = {})
+      context, options = extract_context(options)
+
       data.each do |key, value|
-        case value
-        when Hash
-          item_class = @@relationship_classes["#{context}#{key}"] || @@relationship_classes[key]
-          # puts "key = #{key}, item_class = #{item_class}"
-          if item_class
-            # puts "  creating #{item_class.name} with context #{context}"
-            value = item_class.new.from_json(value.to_json, context)
-          end
-
-          instance_variable_set("@#{key}", value)
-        when Array
-          item_class = @@relationship_classes["#{context}#{key}"] || @@relationship_classes[key]
-
-          arr = value
-          if item_class
-            arr = arr.collect{|item|
-              # puts "  creating #{item_class.name} with context #{context}"
-              item_class.new.from_json(item.to_json, context)
-            }
-          end
-
-          instance_variable_set("@#{key}", arr)
-        else
-          instance_variable_set("@#{key}", value)
-        end
+        val = extract_magpie_instance(key, value, context)
+        set_attribute(key, val, options)
       end
       self
+    end
+
+    def extract_context(options)
+      if options.is_a? Hash
+        [options.delete(:context), options]
+      else
+        [options, {}]
+      end
+    end
+
+    def extract_magpie_instance(key, value, context = nil)
+      case value
+      when Hash
+        item_class(context, key).try do |klass|
+          klass.new.from_json(value.to_json, context)
+        end || value
+      when Array
+        item_class(context, key).try do |klass|
+          value.map { |item| klass.new.from_json(item.to_json, context) }
+        end || value
+      else
+        value
+      end
+    end
+
+    def item_class(context = nil, key)
+      self.class.relationship_classes["#{context}#{key}"] || self.class.relationship_classes[key]
     end
 
     def self.has_many(attribute_name, options={})
@@ -96,7 +133,6 @@ module Magpie
     def attributes
       instance_values
     end
-
 
     def model_attributes(level=0)
       # puts "#{'-'*level} Calling model_attributes for #{self.class}"
@@ -117,7 +153,11 @@ module Magpie
         end
 
       end
-      sanitize_model_attributes(model_attrs).reject{|k,v| v.nil? || v=="null" || v=="nil" || v=="N/A" || v.to_s.downcase=="nan" || v == "POINT( )"}
+      sanitize_model_attributes(model_attrs).reject{|k,v| null?(v) }
+    end
+
+    def null?(v)
+      v.nil? || v=="null" || v=="nil" || v=="N/A" || v.to_s.downcase=="nan" || v == "POINT( )"
     end
 
     def model_attributes_base

@@ -10,6 +10,7 @@ Spork.prefork do
   require 'rspec'
   require 'magpie-gem'
   require 'factory_girl'
+  require 'pry'
 
   # Requires supporting files with custom matchers and macros, etc,
   # in ./support/ and its subdirectories.
