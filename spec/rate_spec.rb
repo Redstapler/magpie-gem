@@ -18,15 +18,15 @@ describe "Magpie::Rate" do
         subject {Magpie::Rate.new.from_json(test[:json])}
 
         it "has correct min rate" do
-          subject.min_rate.should == test[:min_rate]
+          expect(subject.min_rate).to eq(test[:min_rate])
         end
 
         it "has correct min rate" do
-          subject.max_rate.should == test[:max_rate]
+          expect(subject.max_rate).to eq(test[:max_rate])
         end
 
         it "has correct rate" do
-          subject.rate.should == test[:rate]
+          expect(subject.rate).to eq(test[:rate])
         end
       end
     end
@@ -34,7 +34,7 @@ describe "Magpie::Rate" do
     context "to_json" do
       subject {Magpie::Rate.new.from_json(test[:json])}
       it "should generate correct json" do
-        subject.to_json.should == test[:to_json]
+        expect(subject.to_json).to eq(test[:to_json])
       end      
     end
   end

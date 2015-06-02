@@ -5,17 +5,17 @@ describe "Magpie::UnitLease" do
     subject {Magpie::UnitLease.new.from_json("{\"type\":\"NNN\",\"rate\":{\"min\":\"1.0\"}}")}
 
     it "has correct type" do
-      subject.type.should == "NNN"
+      expect(subject.type).to eq("NNN")
     end
 
     it "has correct rate" do
-      subject.rate.min_rate.should == 1.0
-      subject.rate.max_rate.should == nil
-      subject.rate.rate.should == 1.0
+      expect(subject.rate.min_rate).to eq(1.0)
+      expect(subject.rate.max_rate).to eq(nil)
+      expect(subject.rate.rate).to eq(1.0)
     end
 
     it "generates correct json" do
-      subject.to_json.should == "{\"rate\":1.0,\"type\":\"NNN\"}"
+      expect(subject.to_json).to eq("{\"rate\":1.0,\"type\":\"NNN\"}")
     end
   end
 end
