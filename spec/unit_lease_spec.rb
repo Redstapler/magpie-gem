@@ -15,7 +15,7 @@ describe "Magpie::UnitLease" do
     end
 
     it "generates correct json" do
-      expect(subject.to_json).to eq("{\"rate\":1.0,\"type\":\"NNN\"}")
+      expect(subject.to_json).to eq_json("{\"rate\":1.0,\"type\":\"NNN\"}")
     end
   end
 end

@@ -35,7 +35,7 @@ describe "Magpie::Rate" do
       subject {Magpie::Rate.new.from_json(test[:json])}
       it "should generate correct json" do
         expect(subject.to_json).to eq(test[:to_json])
-      end      
+      end
     end
   end
 end

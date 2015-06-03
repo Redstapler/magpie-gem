@@ -14,6 +14,10 @@ module Magpie
 
     @@relationship_classes = HashWithIndifferentAccess.new
 
+    def self.inherited(klass)
+      super
+      klass.add_attributes(attributes)
+    end
 
     def self.attr_accessor(*vars)
       add_attributes(vars)
@@ -22,6 +26,7 @@ module Magpie
 
     def self.add_attributes(*vars)
       attributes.concat( vars.flatten )
+      attributes.uniq!
     end
 
     def self.attributes
@@ -51,19 +56,22 @@ module Magpie
     end
 
     def self.ensure_number_precision(attrib, precision)
-      setter_with_feature(attrib, __callee__) do |value|
+      writer_with_feature(attrib, __callee__) do |value|
         value.is_a?(Numeric) ? value.round(precision) : value
       end
     end
 
-    def self.setter_with_feature(attrib, feature_name)
+    # Can be used for type conversion, requires attribute to already exist
+    # Use this to apply a transformation to a value without accessing its ivar.
+    def self.writer_with_feature(attrib, feature_name)
       define_method("#{ attrib }_with_#{ feature_name }=") do |value|
-        set_attribute("#{ attrib }_without_#{ feature_name }", yield(value))
+        set_attribute("#{ attrib }_without_#{ feature_name }", yield(value), strict: true)
       end
       alias_method_chain "#{ attrib }=", feature_name
     end
 
-    def self.getter_with_feature(attrib, feature_name)
+    # Can be used for type conversion, requires attribute to already exist
+    def self.reader_with_feature(attrib, feature_name)
       define_method("#{ attrib }_with_#{ feature_name }") do |value|
         yield public_send("#{ attrib }_without_#{ feature_name }")
       end
@@ -75,12 +83,16 @@ module Magpie
     end
 
     def set_attribute(attribute_name, value, options = {})
-      method = "#{attribute_name}="
+      method = "#{ attribute_name }="
       return send(method, value) if respond_to? method
 
+      # goal is to only strictly set attributes: i.e. attributes
+      # with setter methods. How they are being stored (ivar, hash, db) should
+      # be inconsequential to the public interface
       if options[:strict]
         self.class.raise_unless_attribute(attribute_name)
       else
+        # for backward compatability, we will want to get rid of this
         instance_variable_set("@#{ attribute_name }", value)
       end
     end
@@ -108,14 +120,12 @@ module Magpie
       when Hash
         item_class(context, key).try do |klass|
           klass.new.from_json(value.to_json, context)
-        end || value
+        end
       when Array
         item_class(context, key).try do |klass|
           value.map { |item| klass.new.from_json(item.to_json, context) }
-        end || value
-      else
-        value
-      end
+        end
+      end || value
     end
 
     def item_class(context = nil, key)
@@ -131,7 +141,9 @@ module Magpie
     end
 
     def attributes
-      instance_values
+      self.class.attributes.each_with_object({}) do |attribute, hash|
+        hash[attribute.to_s] = public_send(attribute)
+      end
     end
 
     def model_attributes(level=0)
