@@ -1,10 +1,14 @@
 module Magpie
+  def self.snakecase_use_type(use_type)
+    use_type.to_s.gsub(/\W/, '').underscore
+  end
+
   module UseTypes
     extend ActiveSupport::Concern
 
     module ClassMethods
       def use_types
-        @types ||= Set.new
+        @use_types ||= Set.new
       end
 
       def register_use_types(*types)
@@ -35,16 +39,16 @@ module Magpie
       def define_use_type_reader(type, options = {})
         klass = options.fetch(:class)
         define_method(type) do
-          types_hash[type] ||= klass.new
+          set_type(type){ klass.build(type) }
         end
       end
 
       def define_use_type_writer(type, options = {})
         klass = options.fetch(:class)
-        enfoce_type = options[:enfoce_type]
+        enforce_type = options[:enforce_type]
 
         define_method("#{type}=") do |val|
-          if enfoce_type && !val.is_a?(klass)
+          if enforce_type && !val.is_a?(klass)
             raise TypeError, "#{ type } must be type #{ klass }, received type #{ val.class }"
           end
           types_hash[type] = val
@@ -52,13 +56,28 @@ module Magpie
       end
     end
 
+    def set_type(type)
+      types_hash[type] ||= yield
+    end
 
     def types_hash
       @types_hash ||= {}
     end
 
-    def as_json(options = {})
-      types_hash.each_with_object({}){ |(key, value), hash| hash[key] = value.as_json }
+    def attribute_keys
+      super - uninitialized_use_types.to_a
+    end
+
+    def attributes
+      super
+    end
+
+    def uninitialized_use_types
+      self.class.use_types - types_hash.keys
+    end
+
+    def exclude_from_model_attributes
+      uninitialized_use_types.map(&:to_s)
     end
   end
 end

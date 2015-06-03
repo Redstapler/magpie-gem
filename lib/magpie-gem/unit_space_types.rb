@@ -4,8 +4,15 @@ require_relative 'unit_space_type'
 module Magpie
   class UnitSpaceTypes < Magpie::Base
     include UseTypes
-    expose_use_types :office, :industrial, :retail, :land,
-      class: Magpie::UnitSpaceType, context: 'unit', enforce_type: true
+    expose_use_types  :office,
+                      :retail,
+                      :industrial,
+                      :office_retail_mixed,
+                      :flex_space,
+                      :land,
+                      :multi_family,
+                      :medical_office,
+                      class: UnitSpaceType, context: 'unit', enforce_type: true
 
     def load_from_model(space)
       default_use_type = "Office".freeze
@@ -40,14 +47,17 @@ module Magpie
 
     def model_attributes_base
       {
-        office_rsf: office.try(:available),
-        office_rate: office.try(:rate).try(:value),
-        warehouse_rate: industrial.try(:rate).try(:value)
+        office_rsf: types_hash[:office].try(:available),
+        office_rate: types_hash[:office].try(:rate).try(:value),
+        warehouse_rate: types_hash[:industrial].try(:rate).try(:value)
       }
     end
 
-    def as_json(options={})
-      super.reject{ |k,v| v.nil? || v.empty? }
+    def as_json(options = {})
+      types_hash
+      .each_with_object({}){ |(key, value), hash| hash[key] = value.as_json }
+      .reject{ |k,v| v.nil? || v.empty? }
     end
+
   end
 end

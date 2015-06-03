@@ -140,8 +140,12 @@ module Magpie
       self.relationship_classes["#{options[:context]}#{attribute_name}"] = options[:class] || attribute_name.to_s.classify.constantize
     end
 
+    def attribute_keys
+      self.class.attributes
+    end
+
     def attributes
-      self.class.attributes.each_with_object({}) do |attribute, hash|
+      attribute_keys.each_with_object({}) do |attribute, hash|
         hash[attribute.to_s] = public_send(attribute)
       end
     end
