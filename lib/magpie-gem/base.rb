@@ -84,7 +84,7 @@ module Magpie
 
     def set_attribute(attribute_name, value, options = {})
       method = "#{ attribute_name }="
-      return send(method, value) if respond_to? method
+      return public_send(method, value) if respond_to? method
 
       # goal is to only strictly set attributes: i.e. attributes
       # with setter methods. How they are being stored (ivar, hash, db) should
