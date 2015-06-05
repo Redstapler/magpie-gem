@@ -7,7 +7,7 @@ describe "Magpie::Feed" do
     property = feed.add_property(id: 'property1')
     property.name = "property 1"
 
-    feed.to_json(skip_validations: true).should == "{\"feed_provider\":null,\"companies\":[],\"people\":[],\"properties\":[{\"for_lease\":true,\"locked_listing\":false,\"id\":\"property1\",\"name\":\"property 1\"}],\"units\":[]}"
+    expect(feed.to_json(skip_validations: true)).to eq_json("{\"feed_provider\":null,\"companies\":[],\"people\":[],\"properties\":[{\"for_lease\":true,\"locked_listing\":false,\"id\":\"property1\",\"name\":\"property 1\"}],\"units\":[]}")
   end
 
 end

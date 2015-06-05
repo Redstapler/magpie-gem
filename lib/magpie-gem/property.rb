@@ -12,8 +12,8 @@ module Magpie
     DEDUP_ATTRIBUTES = [:formatted_long_address]
 
     attr_accessor :for_lease, :name, :description, :zoning, :tax_id_number, :location, :land, :built, :sale, :space,
-                  :media, :amenities, :floor_load_ratio, :contacts, :locked_listing
-    attr_writer :last_updated
+                  :media, :amenities, :floor_load_ratio, :contacts, :locked_listing, :last_updated
+
     has_one :location, :class => Magpie::Location
     has_one :land, :class => Magpie::PropertyLand
     has_one :built, :class => Magpie::PropertyBuilt

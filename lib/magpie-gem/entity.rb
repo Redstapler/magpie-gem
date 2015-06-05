@@ -43,7 +43,7 @@ module Magpie
     def do_save(options = {})
     end
 
-    def build_attrs(options = {})
+    def build_model_attributes(options = {})
       only   = options[:only]
       except = options[:except]
       raise "Can't use :only and :except. Choose one or the other." if only && except
@@ -59,7 +59,7 @@ module Magpie
     end
 
     def save_model(options = {})
-      assign_attributes_to_model(build_attrs(options))
+      assign_attributes_to_model(build_model_attributes(options))
       yield(self.model) if block_given?
       return false unless self.model.changed?
       self.changes = self.model.changes

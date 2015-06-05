@@ -10,6 +10,7 @@ Spork.prefork do
   require 'rspec'
   require 'magpie-gem'
   require 'factory_girl'
+  require 'pry'
 
   # Requires supporting files with custom matchers and macros, etc,
   # in ./support/ and its subdirectories.
@@ -40,4 +41,14 @@ Spork.each_run do
   # Force reload of everything in the app
   Dir["#{File.dirname(__FILE__)}/lib/**/*.rb"].each { |f| load f }
 
+end
+
+RSpec::Matchers.define(:eq_json) do |expected|
+  match do |actual|
+    expect(hashify(actual)).to eq(hashify(expected))
+  end
+
+  def hashify(val)
+    val.is_a?(String) ? JSON.parse(val) : val
+  end
 end
