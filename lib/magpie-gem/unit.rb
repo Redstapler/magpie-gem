@@ -10,7 +10,7 @@ module Magpie
 
     attr_accessor :property
 
-    attr_accessor :property_id, :floor, :suite, :status, :available_on, :contacts, :space, :lease, :media, :amenities
+    attr_accessor :property_id, :name, :floor, :suite, :status, :available_on, :contacts, :space, :lease, :media, :amenities
     has_many :contacts, :class => Magpie::Contact
     has_one :space, :class => Magpie::UnitSpace, :context => 'unit'
     has_one :lease, :class => Magpie::UnitLease
@@ -51,6 +51,7 @@ module Magpie
     def load_from_model(space)
       super(space)
 
+      self.name = space.name
       self.floor = space.floor
       self.suite = space.suite
       self.status = space.status
@@ -67,6 +68,7 @@ module Magpie
 
     def model_attributes_base
       super.merge({
+        name: name,
         floor: floor,
         suite: suite,
         status: status,
