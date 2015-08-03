@@ -8,8 +8,9 @@ module Magpie
   class Unit < Magpie::Entity
     DEDUP_ATTRIBUTES = nil
 
-    attr_accessor :property
+    validates_presence_of :feed_sources
 
+    attr_accessor :property
     attr_accessor :property_id, :name, :floor, :suite, :status, :available_on, :contacts, :space, :lease, :media, :amenities
     has_many :contacts, :class => Magpie::Contact
     has_one :space, :class => Magpie::UnitSpace, :context => 'unit'

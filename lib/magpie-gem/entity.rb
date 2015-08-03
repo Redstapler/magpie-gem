@@ -5,7 +5,7 @@ module Magpie
       alias_method :config, :tap
     end
 
-    validates_presence_of :feed_provider, :id, :feed_sources
+    validates_presence_of :feed_provider, :id
 
     attr_accessor :feed_provider, :id, :feed_sources, :model, :changes, :action
 
