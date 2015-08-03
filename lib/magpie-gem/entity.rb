@@ -5,14 +5,15 @@ module Magpie
       alias_method :config, :tap
     end
 
-    validates_presence_of :feed_provider, :id
+    validates_presence_of :feed_provider, :id, :feed_sources
 
-    attr_accessor :feed_provider, :id, :model, :changes, :action
+    attr_accessor :feed_provider, :id, :feed_sources, :model, :changes, :action
 
     def load_from_model(m)
       self.model = m
       self.feed_provider = m.feed_provider
       self.id = m.feed_id.to_s
+      self.feed_sources = m.feed_sources || []
       self.changes = {}
 
       self
@@ -22,6 +23,7 @@ module Magpie
       {
         feed_id: id.to_s,
         feed_provider: feed_provider,
+        feed_sources: feed_sources
       }
     end
 
