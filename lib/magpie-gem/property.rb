@@ -14,7 +14,7 @@ module Magpie
     validates_presence_of :feed_sources
 
     attr_accessor :for_lease, :name, :description, :zoning, :tax_id_number, :location, :land, :built, :sale, :space,
-                  :media, :amenities, :floor_load_ratio, :contacts, :locked_listing, :last_updated
+                  :media, :amenities, :floor_load_ratio, :contacts, :locked_listing, :last_updated, :feed_source_ids
 
     has_one :location, :class => Magpie::Location
     has_one :land, :class => Magpie::PropertyLand
@@ -61,6 +61,7 @@ module Magpie
       self.floor_load_ratio.load_from_model(building)
       self.amenities.load_from_model(building)
       self.contacts = Magpie::Contact.load_contacts_from_model(building)
+      self.feed_source_ids = building.feed_source_ids
       self
     end
 
@@ -71,7 +72,8 @@ module Magpie
         zoning: @zoning,
         parcel: @tax_id_number,
         locked_listing: @locked_listing,
-        modified_on: last_updated
+        modified_on: last_updated,
+        feed_source_ids: feed_source_ids
       })
     end
 
