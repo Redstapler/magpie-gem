@@ -27,8 +27,15 @@ module Magpie
       }
     end
 
+    def primary_feed_source_id
+      feed_source_ids.try(:first)
+    end
+
     def lookup_model
-      model_class.where('feed_provider = ?', feed_provider).where('feed_id = ?', id.to_s).first
+      instance = model_class.where('feed_provider = ?', feed_provider).where('feed_id = ?', id.to_s).first
+      return instance if (instance || !primary_feed_source_id)
+
+      model_class.where('feed_provider = ?', feed_provider).where('? = ANY(feed_source_ids)', primary_feed_source_id).first
     end
 
     def save(options={})
