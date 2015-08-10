@@ -14,7 +14,7 @@ module Magpie
     validates_presence_of :feed_sources
 
     attr_accessor :for_lease, :name, :description, :zoning, :tax_id_number, :location, :land, :built, :sale, :space,
-                  :media, :amenities, :floor_load_ratio, :contacts, :locked_listing, :last_updated, :feed_source_ids
+                  :media, :amenities, :floor_load_ratio, :contacts, :locked_listing, :last_updated
 
     has_one :location, :class => Magpie::Location
     has_one :land, :class => Magpie::PropertyLand

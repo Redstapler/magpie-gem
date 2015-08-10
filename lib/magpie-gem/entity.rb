@@ -7,7 +7,7 @@ module Magpie
 
     validates_presence_of :feed_provider, :id
 
-    attr_accessor :feed_provider, :id, :feed_sources, :model, :changes, :action
+    attr_accessor :feed_provider, :id, :feed_sources, :feed_source_ids, :model, :changes, :action
 
     def load_from_model(m)
       self.model = m
