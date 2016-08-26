@@ -6,7 +6,7 @@ module Magpie
   class PropertySpaceType < Magpie::Base
     include UseType
 
-    attr_accessor :total, :lease, :rate, :specific_rate
+    attr_accessor :total, :lease, :rate, :specific_rate, :sub_type
     has_one :lease, :class => Magpie::PropertySpaceTypeLease, :context => 'property'
 
     ensure_number_precision(:specific_rate, 4)

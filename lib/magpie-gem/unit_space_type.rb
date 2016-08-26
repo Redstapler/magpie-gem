@@ -2,7 +2,7 @@ require 'magpie-gem/rate.rb'
 
 module Magpie
   class UnitSpaceType < Magpie::Base
-    attr_accessor :available, :rate
+    attr_accessor :available, :rate, :sub_type
     ensure_number_precision(:available, 0)
 
     def self.build(type)

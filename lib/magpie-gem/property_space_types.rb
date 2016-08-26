@@ -61,11 +61,9 @@ module Magpie
     expose_use_types  :office,
                       :retail,
                       :industrial,
-                      :office_retail_mixed,
-                      :flex_space,
                       :land,
                       :multi_family,
-                      :medical_office,
+                      :special_purpose,
                       class: PropertySpaceType, context: 'property', enforce_type: true
 
     def load_from_model(building)
