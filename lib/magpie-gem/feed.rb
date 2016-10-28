@@ -64,7 +64,12 @@ module Magpie
       obj = JSON.parse(json)
 
       Magpie::Base.each_entity_class {|entity_class, entity_name, entity_name_plural|
-        instances = (obj[entity_name_plural] || {}).collect{|c| model = entity_class.new; model.set_attributes(c, entity_name); model.feed_provider = obj['feed_provider']; model}
+        instances = (obj[entity_name_plural] || {}).map do |c|
+          model = entity_class.new
+          model.set_attributes(c, entity_name)
+          model.instance_eval{ @feed_provider ||= obj['feed_provider'] }
+          model
+        end
         instances.each {|instance|
           # add each instance using the add_ method so it gets addes to both the list (e.g. @companies) and the hash (e.g. @companies_by_id)
           self.send("add_#{entity_name}_instance", instance)
