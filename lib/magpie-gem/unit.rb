@@ -11,7 +11,7 @@ module Magpie
     validates_presence_of :feed_sources
 
     attr_accessor :property
-    attr_accessor :property_id, :name, :floor, :suite, :status, :available_on, :contacts, :space, :lease, :media, :amenities
+    attr_accessor :property_id, :name, :floor, :suite, :status, :available_on, :available_in, :contacts, :space, :lease, :media, :amenities
     has_many :contacts, :class => Magpie::Contact
     has_one :space, :class => Magpie::UnitSpace, :context => 'unit'
     has_one :lease, :class => Magpie::UnitLease
@@ -57,6 +57,7 @@ module Magpie
       self.suite = space.suite
       self.status = space.status
       self.available_on = space.available_on
+      self.available_in = space.available_in
       self.contacts = Magpie::Contact.load_contacts_from_model(space)
       self.space.load_from_model(space)
       self.lease.load_from_model(space)
@@ -75,6 +76,7 @@ module Magpie
         suite: suite,
         status: status,
         available_on: available_on,
+        available_in: available_in,
         feed_source_ids: feed_source_ids
       })
     end
