@@ -98,5 +98,9 @@ module Magpie
       attribs = model_attributes
       validate_model_attributes_presence [:address, :city, :state, :postal_code], attribs
     end
+
+    def as_json(*)
+      super.reverse_merge('locked_listing' => locked_listing)
+    end
   end
 end
