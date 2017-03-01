@@ -11,7 +11,7 @@ module Magpie
     validates_presence_of :feed_sources
 
     attr_accessor :property
-    attr_accessor :property_id, :name, :floor, :suite, :status, :available_on, :available_in, :contacts, :space, :lease, :media, :amenities
+    attr_accessor :property_id, :name, :floor, :suite, :status, :available_on, :available_in, :contacts, :space, :lease, :media, :amenities, :description
     has_many :contacts, :class => Magpie::Contact
     has_one :space, :class => Magpie::UnitSpace, :context => 'unit'
     has_one :lease, :class => Magpie::UnitLease
@@ -53,6 +53,7 @@ module Magpie
       super(space)
 
       self.name = space.name
+      self.description = space.comment
       self.floor = space.floor
       self.suite = space.suite
       self.status = space.status
@@ -72,6 +73,7 @@ module Magpie
     def model_attributes_base
       super.merge({
         name: name,
+        comment: description,
         floor: floor,
         suite: suite,
         status: status,
