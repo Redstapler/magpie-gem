@@ -27,10 +27,10 @@ module Magpie
     end
 
     def as_json(options = nil)
-      if @rate.present?
-        @rate
+      if self.min_rate.present? && self.max_rate.present?
+        { min: self.min_rate, max: self.max_rate }
       else
-        { min: @min_rate, max: @max_rate }
+        @rate
       end
     end
 
