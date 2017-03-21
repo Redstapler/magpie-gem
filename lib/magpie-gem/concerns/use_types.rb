@@ -39,7 +39,9 @@ module Magpie
       def define_use_type_reader(type, options = {})
         klass = options.fetch(:class)
         define_method(type) do
-          set_type(type){ klass.build(type) }
+          @use_type_rank ||= -1
+          @use_type_rank += 1
+          set_type(type){ klass.build(type, @use_type_rank) }
         end
       end
 

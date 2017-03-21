@@ -23,8 +23,8 @@ module Magpie
         use_type_qualifiers.detect{ |qualifier| qualifier === type }
       end
 
-      def build(type)
-        (children + [self]).detect{ |klass| klass.use_type?(type) }.new(type)
+      def build(type, rank = nil)
+        (children + [self]).detect{ |klass| klass.use_type?(type) }.new(type, rank)
       end
     end
   end

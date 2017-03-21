@@ -58,13 +58,22 @@ module Magpie
 
   class PropertySpaceTypes < Magpie::Base
     include UseTypes
-    expose_use_types  :office,
-                      :retail,
-                      :industrial,
-                      :land,
-                      :multi_family,
-                      :special_purpose,
-                      class: PropertySpaceType, context: 'property', enforce_type: true
+
+    with_options context: 'property_types', enforce_type: true do |context|
+      context.expose_use_types  :land,
+                                :multi_family,
+                                :special_purpose,
+                                class: PropertySpaceType
+
+      context.expose_use_types  :office,
+                                class: PropertySpaceTypeOffice
+
+      context.expose_use_types  :retail,
+                                class: PropertySpaceTypeRetail
+
+      context.expose_use_types  :industrial,
+                                class: PropertySpaceTypeIndustrial
+    end
 
     def load_from_model(building)
       %w[office retail industrial].each do |use_type|
@@ -74,6 +83,8 @@ module Magpie
     end
 
     def from_json(json, context=nil)
+      raise "Unknown #from_json context: #{ context } for #{ self.class }" if context != 'property'
+      context = "property_types"
       obj = JSON.parse(json).slice(*self.class.use_types.map(&:to_s))
       self.set_attributes(obj, context)
       self
