@@ -91,8 +91,8 @@ module Magpie
     end
 
     def model_attributes_base
-      {
-      }
+      # Field for holding all other types of rsf. Will be summed with office, retail and industrial rsf in the end.
+      {additional_rsf: types_hash.except(:office, :retail, :industrial).values.map(&:total).compact.reduce(&:+)}
     end
   end
 end
