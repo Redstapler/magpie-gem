@@ -3,8 +3,8 @@ module Magpie
     attr_accessor :street1, :street2, :city, :state, :country, :postal_code
 
     def load_from_model(model)
-      self.street1 = model.try(:address1) rescue model.try(:address)
-      self.street2 = model.try(:address2) rescue nil
+      self.street1 = model.try(:address1) || model.try(:address)
+      self.street2 = model.try(:address2)
       self.city = model.city
       self.state = model.state
       self.country = model.country
