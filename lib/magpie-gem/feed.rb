@@ -43,11 +43,11 @@ module Magpie
         @data[entity_name_plural] << item
         @data["#{entity_name_plural}_by_id"][item.id] = item
         item
-      end      
+      end
     }
 
-    attr_accessor :feed_provider
-    
+    attr_accessor :feed_provider, :publisher_email, :publisher_application, :publisher_application_version
+
     def initialize(attributes={})
       super
       @data = {}
@@ -83,6 +83,9 @@ module Magpie
     def as_json(options={})
       {
         feed_provider: feed_provider,
+        publisher_email: publisher_email,
+        publisher_application: publisher_application,
+        publisher_application_version: publisher_application_version,
         companies: companies,
         people: people,
         properties: properties,
