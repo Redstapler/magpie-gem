@@ -1,6 +1,6 @@
 module Magpie
   class PostalAddress < Magpie::Base
-    attr_accessor :street1, :street2, :city, :state, :country, :postal_code
+    attr_accessor :street1, :street2, :city, :state, :country, :postal_code, :verified, :smarty_streets_result
 
     def load_from_model(model)
       self.street1 = model.try(:address1) || model.try(:address)
