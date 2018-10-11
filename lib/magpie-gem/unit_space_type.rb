@@ -2,11 +2,17 @@ require 'magpie-gem/rate.rb'
 
 module Magpie
   class UnitSpaceType < Magpie::Base
-    attr_accessor :available, :rate    
+    attr_accessor :available, :rate, :sub_type, :type, :rank
     ensure_number_precision(:available, 0)
 
-    def initialize
+    def self.build(type, rank = nil)
+      new(type, rank)
+    end
+
+    def initialize(type = nil, rank = nil)
       self.rate = Magpie::Rate.new(nil, nil, nil)
+      self.type = type
+      self.rank = rank
     end
 
     def load_from_model(space)

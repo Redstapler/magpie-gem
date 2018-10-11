@@ -1,7 +1,17 @@
 module Magpie
   class UnitLease < Magpie::Base
+    WHATS_INCLUDE_HASH = {}.tap do |h|
+      h['Gross']          = {tax: true, water_sewege: true, electrical: true}
+      h['Modified Gross'] = {tax: true, water_sewege: true, electrical: false}
+      h['Net']            = {tax: true, water_sewege: true, electrical: false}
+      h['Double Net']     = {tax: true, water_sewege: false, electrical: false}
+      h['Triple Net']     = {tax: false, water_sewege: false, electrical: false}
+      h['Full Service']   = {tax: true, water_sewege: true, electrical: true}
+      h.values.map(&:freeze)
+    end.freeze
+
     attr_accessor :leased_on, :lease_expires_on, :listed_on, :sublease, :coworking, :type, :operating_expenses, :tax, :water_sewege, :electrical, :rate
-    # has_one :rate, :class => Magpie::Rate, :context => 'unit'
+    has_one :rate, :class => Magpie::Rate, :context => 'unit'
 
     def initialize
       self.rate = Magpie::Rate.new(nil, nil, nil)
@@ -16,19 +26,8 @@ module Magpie
       self.type = space.lease_type
       self.operating_expenses = space.operating_expenses
 
-      whatsIncluded = {}
-      whatsIncluded['Gross']          = {tax: true, water_sewege: true, electrical: true}
-      whatsIncluded['Modified Gross'] = {tax: true, water_sewege: true, electrical: false}
-      whatsIncluded['Net']            = {tax: true, water_sewege: true, electrical: false}
-      whatsIncluded['Double Net']     = {tax: true, water_sewege: false, electrical: false}
-      whatsIncluded['Triple Net']     = {tax: false, water_sewege: false, electrical: false}
-      whatsIncluded['Full Service']   = {tax: true, water_sewege: true, electrical: true}
-
-      w = whatsIncluded[@type]
-      if w != nil
-        w.each {|k,v|
-          self.send("#{k}=", v ? 'included' : 'not included')
-        }
+      whats_included(@type).try(:each) do |k, v|
+        self.send("#{k}=", v ? 'included' : 'not included')
       end
 
       if space.min_asking_rate && space.max_asking_rate && space.min_asking_rate != space.max_asking_rate
@@ -38,6 +37,16 @@ module Magpie
         self.rate.rate = space.min_asking_rate || space.office_rate || space.warehouse_rate
       end
 
+      self
+    end
+
+    def whats_included(type)
+      WHATS_INCLUDE_HASH[type]
+    end
+
+    def from_json(json, context=nil)
+      super
+      self.rate = Magpie::Rate.new.from_json(JSON.parse(json)["rate"].to_json)
       self
     end
 

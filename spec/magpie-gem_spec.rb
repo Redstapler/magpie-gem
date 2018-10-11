@@ -2,8 +2,8 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe "MagpieGem" do
   it "loads fine" do
-    Magpie::Base.should_not == nil
-    Magpie::Unit.should_not == nil
-    Magpie::UnitSpace.should_not == nil
+    expect(Magpie::Base).not_to eq(nil)
+    expect(Magpie::Unit).not_to eq(nil)
+    expect(Magpie::UnitSpace).not_to eq(nil)
   end
 end
