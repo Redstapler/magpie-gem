@@ -3,8 +3,9 @@ module Magpie
     attr_accessor :street1, :street2, :city, :state, :country, :postal_code, :verified, :smarty_streets_result
 
     def load_from_model(model)
-      self.street1 = model.try(:address1) || model.try(:address)
-      self.street2 = model.try(:address2)
+      self.street1   = (model.respond_to?(:address1) && model.try(:address1)).presence
+      self.street1 ||= (model.respond_to?(:address)  && model.try(:address) ).presence
+      self.street2   = (model.respond_to?(:address2) && model.try(:address2)).presence
       self.city = model.city
       self.state = model.state
       self.country = model.country
