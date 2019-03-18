@@ -62,7 +62,7 @@ module Magpie
 
     def from_json(json, context=nil)
       obj = JSON.parse(json)
-
+      @data['sublease'] = obj.fetch('sublease', false)
       Magpie::Base.each_entity_class {|entity_class, entity_name, entity_name_plural|
         instances = (obj[entity_name_plural] || {}).map do |c|
           model = entity_class.new
@@ -83,6 +83,7 @@ module Magpie
     def as_json(options={})
       {
         feed_provider: feed_provider,
+        sublease: sublease?,
         publisher_email: publisher_email,
         publisher_application: publisher_application,
         publisher_application_version: publisher_application_version,
@@ -91,6 +92,10 @@ module Magpie
         properties: properties,
         units: units
       }
+    end
+
+    def sublease?
+      @data['sublease'] == true
     end
   end
 end
