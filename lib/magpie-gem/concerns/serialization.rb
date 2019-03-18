@@ -5,7 +5,7 @@ module Magpie
 
     def as_json(options={})
       options ||= {}
-      options[:except] = ((options[:except] || []) << [:errors, :validation_context, :model_class, :precisions]).flatten
+      options[:except] = ((options[:except] || []) << [:errors, :validation_context, :model_class, :precisions, :sublease]).flatten
       super.as_json(options).clean!
     end
 
