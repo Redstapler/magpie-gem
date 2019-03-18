@@ -9,9 +9,13 @@ require 'magpie-gem/property_amenities.rb'
 
 module Magpie
   class Property < Magpie::Entity
-    DEDUP_ATTRIBUTES = [:address, :city, :state]
+    DEDUP_ATTRIBUTES = [:formatted_long_address]
 
-    attr_accessor :name, :description, :zoning, :tax_id_number, :location, :land, :built, :sale, :space, :media, :amenities, :floor_load_ratio, :contacts
+    validates_presence_of :feed_sources
+
+    attr_accessor :for_lease, :name, :description, :zoning, :tax_id_number, :location, :land, :built, :sale, :space,
+                  :media, :amenities, :floor_load_ratio, :contacts, :locked_listing, :last_updated
+
     has_one :location, :class => Magpie::Location
     has_one :land, :class => Magpie::PropertyLand
     has_one :built, :class => Magpie::PropertyBuilt
@@ -23,6 +27,7 @@ module Magpie
     has_one :amenities, :class => Magpie::PropertyAmenities, :context => 'property'
 
     def initialize
+      self.for_lease = true
       self.location = Magpie::Location.new
       self.land = Magpie::PropertyLand.new
       self.built = Magpie::PropertyBuilt.new
@@ -32,12 +37,15 @@ module Magpie
       self.floor_load_ratio = Magpie::PropertyFloorLoadRatio.new
       self.amenities = Magpie::PropertyAmenities.new
       self.contacts = []
+      self.locked_listing = false
     end
 
     def load_from_model(building)
       super(building)
       self.name = building.name
       self.description = building.comment
+      self.for_lease = :published.eql? building.visibility.to_sym
+      self.locked_listing = building.locked_listing
       # updated_at: building.updated_at,
       # active: building.active,
       # owner_company_id: building.owner_company_id,
@@ -53,7 +61,7 @@ module Magpie
       self.floor_load_ratio.load_from_model(building)
       self.amenities.load_from_model(building)
       self.contacts = Magpie::Contact.load_contacts_from_model(building)
-
+      self.feed_source_ids = building.feed_source_ids
       self
     end
 
@@ -62,8 +70,22 @@ module Magpie
         name: @name,
         comment: @description,
         zoning: @zoning,
-        parcel: @tax_id_number
+        parcel: @tax_id_number,
+        locked_listing: @locked_listing,
+        modified_on: last_updated,
+        feed_source_ids: feed_source_ids
       })
+    end
+
+    def last_updated
+      case @last_updated
+      when String
+        DateTime.parse(@last_updated)
+      when Time, Date, nil
+        @last_updated
+      else
+        raise TypeError, "Unhandled last_updated type of class: #{@last_updated.class} "
+      end
     end
 
     def sanitize_model_attributes(attrs)
@@ -75,6 +97,10 @@ module Magpie
     def validate_model_attributes
       attribs = model_attributes
       validate_model_attributes_presence [:address, :city, :state, :postal_code], attribs
+    end
+
+    def as_json(*)
+      super.reverse_merge('locked_listing' => locked_listing)
     end
   end
 end

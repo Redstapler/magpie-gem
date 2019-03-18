@@ -43,11 +43,11 @@ module Magpie
         @data[entity_name_plural] << item
         @data["#{entity_name_plural}_by_id"][item.id] = item
         item
-      end      
+      end
     }
 
-    attr_accessor :feed_provider
-    
+    attr_accessor :feed_provider, :publisher_email, :publisher_application, :publisher_application_version
+
     def initialize(attributes={})
       super
       @data = {}
@@ -62,9 +62,14 @@ module Magpie
 
     def from_json(json, context=nil)
       obj = JSON.parse(json)
-
+      @data['sublease'] = obj.fetch('sublease', false)
       Magpie::Base.each_entity_class {|entity_class, entity_name, entity_name_plural|
-        instances = (obj[entity_name_plural] || {}).collect{|c| model = entity_class.new; model.set_attributes(c, entity_name); model.feed_provider = obj['feed_provider']; model}
+        instances = (obj[entity_name_plural] || {}).map do |c|
+          model = entity_class.new
+          model.set_attributes(c, entity_name)
+          model.instance_eval{ @feed_provider ||= obj['feed_provider'] }
+          model
+        end
         instances.each {|instance|
           # add each instance using the add_ method so it gets addes to both the list (e.g. @companies) and the hash (e.g. @companies_by_id)
           self.send("add_#{entity_name}_instance", instance)
@@ -78,11 +83,19 @@ module Magpie
     def as_json(options={})
       {
         feed_provider: feed_provider,
+        sublease: sublease?,
+        publisher_email: publisher_email,
+        publisher_application: publisher_application,
+        publisher_application_version: publisher_application_version,
         companies: companies,
         people: people,
         properties: properties,
         units: units
       }
+    end
+
+    def sublease?
+      @data['sublease'] == true
     end
   end
 end

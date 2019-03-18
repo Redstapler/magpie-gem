@@ -1,7 +1,9 @@
 module Magpie
   class Person < Magpie::Entity
-    attr_accessor :company
 
+    validates_presence_of :feed_sources
+
+    attr_accessor :company
     attr_accessor :id, :name, :email, :phone, :default_role, :company_id
 
     DEDUP_ATTRIBUTES = [:email]

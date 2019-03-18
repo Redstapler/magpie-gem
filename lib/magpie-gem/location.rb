@@ -1,7 +1,7 @@
 module Magpie
   class Location < Magpie::Base
     has_one :postal_address, :class => Magpie::PostalAddress
-    attr_accessor :postal_address, :latitude, :longitude, :county
+    attr_accessor :postal_address, :latitude, :longitude, :county, :formatted_long_address
     validates_presence_of :postal_address
 
     def initialize
@@ -13,6 +13,7 @@ module Magpie
       self.latitude = model.location.try(:latitude)
       self.longitude = model.location.try(:longitude)
       self.county = model.county
+      self.formatted_long_address = model.formatted_long_address
 
       self
     end
@@ -25,7 +26,7 @@ module Magpie
       if @longitude.present? && @latitude.present?
         attribs[:location] = "POINT(#{@longitude} #{@latitude})"
       end
-
+      attribs[:formatted_long_address] = @formatted_long_address
       attribs
     end
   end
